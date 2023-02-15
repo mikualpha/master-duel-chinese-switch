@@ -1,0 +1,11 @@
+output/**
+dist
+build
+
+data.unity3d
+
+*.spec
+__pycache__
+generated-*
+
+!.gitkeep
