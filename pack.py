@@ -1,10 +1,11 @@
+import os
 from typing import Any
 
 import UnityPy
 
 from hint import CardEncryptedData
 from utils import getFilesList
-import os
+
 
 def createFolder(path: str):
     path = path.strip()

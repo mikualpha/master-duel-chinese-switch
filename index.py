@@ -17,10 +17,12 @@ from utils import make_dir, get_resource_path
 def main(
     path_game_root: str,
     set_status: Callable[[str], None] = lambda _: print(_),
+    set_status_msg: Callable[[str], None] = lambda _: print(_),
     log: Callable[[str], None] = lambda _: print(_),
     network_error_cb: Callable[[], None] = lambda: None,
     custom_trans: bool = True,
     custom_font: bool = False,
+    output_to_local: bool = False,
     dev_mode: bool = True,
 ):
     try:
@@ -73,15 +75,24 @@ def main(
         )
 
         # 复制回去
-        set_status(Status.overriding)
+        set_status(Status.overriding)  
         copy_to_original(
             path_game_root,
-            path_output=get_resource_path("output"),
+            path_pack=get_resource_path("output"),
             dir_font=get_resource_path("resources"),
             custom_font=custom_font,
+            output_to_local=output_to_local,
         )
 
         set_status(Status.success)
+        set_status_msg("翻译成功！")
+
+    except IOError as e:
+        # TODO 这儿对应无权限
+        print(e)
+        log(str(e))
+        set_status(Status.error_io)
+        set_status_msg('请以管理员身份运行本程序，\n或者勾选下面的"输出到本地目录"。')
 
     except Exception as e:
         print(e)
@@ -95,4 +106,5 @@ if __name__ == "__main__":
         r"E:\Program Files (x86)\Steam\steamapps\common\Yu-Gi-Oh!  Master Duel",
         custom_trans=False,
         custom_font=False,
+        output_to_local=True
     )

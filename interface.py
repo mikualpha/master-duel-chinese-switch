@@ -133,6 +133,7 @@ def main(page: ft.Page):
     """
     use_custom_trans: bool = True
     use_custom_font: bool = True
+    output_to_local: bool = False
 
     def on_click_c1(e: ft.FilePickerResultEvent):
         nonlocal use_custom_trans
@@ -145,9 +146,16 @@ def main(page: ft.Page):
         use_custom_font = e.data == "true"
         c2.label = "使用隶书卡片字体" if use_custom_font else "使用楷书卡片字体"
         c2.update()
+    
+    def on_click_c3(e: ft.FilePickerResultEvent):
+        nonlocal output_to_local
+        output_to_local = e.data == "true"
+        c3.label = "输出到本地目录，便于手动覆盖" if output_to_local else "不输出到本地目录"
+        c3.update()
 
     c1 = ft.Checkbox(label="使用汉化组卡片翻译", value=True, on_change=on_click_c1)
     c2 = ft.Checkbox(label="使用隶书卡片字体", value=True, on_change=on_click_c2)
+    c3 = ft.Checkbox(label="不输出到本地目录", value=False, on_change=on_click_c3)
 
     """
     安装翻译
@@ -168,10 +176,12 @@ def main(page: ft.Page):
         install_trans(
             path_game_root,
             set_status=status_update_cb,
+            set_status_msg=status_update_msg_cb,
             network_error_cb=network_error_cb,
             log=log,
             custom_trans=use_custom_trans,
             custom_font=use_custom_font,
+            output_to_local=output_to_local,
             dev_mode=False,
         )
         is_installing = False
@@ -180,6 +190,11 @@ def main(page: ft.Page):
         status_text.current.value = status
         status_text.current.update()
     
+    def status_update_msg_cb(msg: str):
+        status_text_msg.current.message = msg
+        status_text_msg.current.visible = bool(msg)
+        status_text_msg.current.update()
+    
     @throttle(2)
     def network_error_cb():
         page.snack_bar = ft.SnackBar(ft.Text(f"网络错误，部分卡片将采用官方简中翻译。"))
@@ -187,6 +202,7 @@ def main(page: ft.Page):
         page.update()
 
     status_text = ft.Ref[ft.Text]()
+    status_text_msg = ft.Ref[ft.Tooltip]()
 
     # 添加到页面
     page.add(
@@ -219,23 +235,28 @@ def main(page: ft.Page):
                                         style=btn_style,
                                         on_click=install,
                                     ),
-                                    ft.Text(
-                                        "安装中",
-                                        ref=status_text,
-                                        size=12,
-                                        color="#555555",
-                                        visible=False,
-                                    ),
+                                    ft.Tooltip(
+                                        message="安装中",
+                                        ref=status_text_msg,
+                                        content=ft.Text(
+                                            "安装中",
+                                            ref=status_text,
+                                            size=12,
+                                            color="#555555",
+                                            visible=False,
+                                        )
+                                    ), 
                                 ],
                                 spacing=10,
                             ),
-                        ]
+                        ],
+                        scale=ft.Scale(0.95, alignment=ft.alignment.top_left)
                     ),
-                    ft.Column([c1, c2], spacing=0),
+                    ft.Column([c1, c2, c3], spacing=0, scale=ft.Scale(0.85, alignment=ft.alignment.top_left)),
                 ],
                 alignment=ft.MainAxisAlignment.CENTER,
             ),
-            padding=ft.padding.symmetric(0, 50),
+            padding=ft.padding.symmetric(-15, 50),
         )
     )
 

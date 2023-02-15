@@ -43,3 +43,4 @@ class Status:
     success: str = "成功"
     failed: str = "失败"
     error_network: str = "网络错误"
+    error_io: str = "无权限"
