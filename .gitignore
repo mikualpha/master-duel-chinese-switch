@@ -7,5 +7,6 @@ data.unity3d
 *.spec
 __pycache__
 generated-*
+*logs.txt
 
 !.gitkeep
