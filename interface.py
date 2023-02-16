@@ -7,7 +7,7 @@ import flet as ft
 from index import main as install_trans
 from utils import get_logger, throttle
 
-RELEASE_URL = "baidu.com"  # TODO
+RELEASE_URL = "https://www.bilibili.com/read/cv21869124"  # TODO
 
 
 def log(e: Any) -> None:
@@ -25,6 +25,8 @@ def main(page: ft.Page):
     page.theme = ft.Theme(font_family="Microsoft YaHei")
     page.window_title_bar_buttons_hidden = True
     page.window_title_bar_hidden = True
+    page.dark_theme = ft.Theme(font_family="Microsoft YaHei")
+    page.theme_mode = ft.ThemeMode.DARK
     page.update()
 
     """
@@ -35,7 +37,7 @@ def main(page: ft.Page):
             [
                 ft.WindowDragArea(
                     ft.Container(
-                        ft.Text(""), bgcolor=ft.colors.TRANSPARENT, expand=True
+                        ft.Text(""), opacity=0, expand=True
                     ),
                     expand=True,
                 ),
@@ -213,8 +215,9 @@ def main(page: ft.Page):
                         message="打开软件发布页",
                         content=ft.IconButton(
                             icon=ft.icons.JOIN_RIGHT_SHARP,
+                            # icon=ft.icons.AUTO_MODE,
                             icon_size=50,
-                            icon_color="#0061a4",
+                            icon_color=ft.colors.BLUE_400,
                             on_click=lambda _: webbrowser.open(RELEASE_URL, 1),
                         ),
                     ),
@@ -242,12 +245,12 @@ def main(page: ft.Page):
                                             "安装中",
                                             ref=status_text,
                                             size=12,
-                                            color="#555555",
+                                            opacity=0.65,
                                             visible=False,
                                         )
                                     ), 
                                 ],
-                                spacing=10,
+                                spacing=15,
                             ),
                         ],
                         scale=ft.Scale(0.95, alignment=ft.alignment.top_left)

@@ -27,6 +27,7 @@ def main(
 ):
     try:
         make_dir(get_resource_path("output"))
+        set_status_msg("安装中...")
 
         # 首先 copy到本地
         set_status(Status.obtaining)

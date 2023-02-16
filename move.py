@@ -55,7 +55,7 @@ def copy_font(path_game_root: str, dir_font: str, custom_font: bool = False):
     path_local_data = path.join(path_game_root, "LocalData")
     dirs = os.listdir(path_local_data)
     for dir in dirs:
-        path_dst = path.join(path_local_data, dir, "0000", "f3", FONT_FILE_NAME)
+        path_dst = path.join(path_local_data, dir, "0000", FONT_FILE_NAME[:2], FONT_FILE_NAME)
         shutil.copyfile(
             path.join(
                 dir_font,

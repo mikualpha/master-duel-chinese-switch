@@ -1,6 +1,6 @@
 from tqdm import tqdm
 from hint import CardRawData, CardRawDataItem
-from api import api
+from api import api, api_local
 from typing import Callable
 from tqdm.contrib import tenumerate
 
@@ -95,14 +95,16 @@ def card_translate(
     for i, item in iterable:
         name_jp = item["name"]["ja-jp"]
         progress_update_cb(f"{i}/{len(card_raw_data)}")
-        result_archived = search_archived_data(name_jp)
-        if result_archived is not None:
+        if result_archived:= search_archived_data(name_jp):
             # 在已归档数据中找到了对应的日文名
             item["name"]["custom"] = result_archived["name"]["custom"]
             item["desc"]["custom"] = unity(result_archived["desc"]["custom"])
             continue
-        result_api = api(name_jp, network_error_cb)
-        if result_api is not None:
+        if result_api_local:= api_local(name_jp):
+            # 在本地API中找到了对应的日文名
+            item["name"]["custom"] = result_api_local["name"]
+            item["desc"]["custom"] = unity(result_api_local["desc"])
+        if result_api:= api(name_jp, network_error_cb):
             # 在API中找到了对应的日文名
             item["name"]["custom"] = result_api["name"]
             item["desc"]["custom"] = unity(result_api["desc"])  # 修正灵摆...修正\r\n
