@@ -68,7 +68,7 @@ def api(
         item = result[i]
         name: str = item["cn_name"]
         desc: str = item["text"]["desc"]
-        if p_desc := item["text"]["pdesc"] != "":
+        if (p_desc := item["text"]["pdesc"]) != "":
             desc = f"{desc}\n【灵摆效果】\n{p_desc}"
         return {"name": name, "desc": desc}
 
