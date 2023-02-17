@@ -89,7 +89,7 @@ def main(
         set_status_msg("翻译成功！")
 
     except IOError as e:
-        # TODO 这儿对应无权限
+        # 这儿对应无权限
         print(e)
         log(str(e))
         set_status(Status.error_io)

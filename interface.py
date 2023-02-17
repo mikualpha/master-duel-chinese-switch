@@ -1,3 +1,4 @@
+from ctypes import alignment
 import webbrowser
 from os import path
 from typing import Any
@@ -7,8 +8,7 @@ import flet as ft
 from index import main as install_trans
 from utils import get_logger, throttle
 
-RELEASE_URL = "https://www.bilibili.com/read/cv21869124"  # TODO
-
+RELEASE_URL = "https://www.bilibili.com/read/cv21869124" 
 
 def log(e: Any) -> None:
     get_logger().error(e, stack_info=True)
@@ -50,6 +50,7 @@ def main(page: ft.Page):
             ]
         )
     )
+
     """
     dialog
     """

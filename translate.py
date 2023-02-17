@@ -1,8 +1,11 @@
-from tqdm import tqdm
-from hint import CardRawData, CardRawDataItem
-from api import api, api_local
+from functools import reduce
 from typing import Callable
+
+from tqdm import tqdm
 from tqdm.contrib import tenumerate
+
+from api import api, api_local
+from hint import CardRawData, CardRawDataItem
 
 
 def unify_pendulum_desc(desc: str) -> str:
@@ -45,13 +48,30 @@ def unify_separator(desc: str) -> str:
     2. 召唤限制\n①
     3. ① ②这些的前面不会有\r\n
     """
-    for key_word in ["②", "③", "④", "⑤", "⑥", "⑦"]:
+    orders_without_first = ["②", "③", "④", "⑤", "⑥", "⑦"]
+    ch_separator = "【灵摆效果】"
+    for order in ["②", "③", "④", "⑤", "⑥", "⑦"]:
         for prefix in ["\r\n", "\n", "\r"]:
-            desc = desc.replace(f"{prefix}{key_word}", key_word)
+            desc = desc.replace(f"{prefix}{order}", order)
     # 处理①
     for prefix in ["\r\n", "\n", "\r"]:
         desc = desc.replace(f"。{prefix}①", "。①")
-    return desc.replace("\r\n", "\n").strip()
+    desc = desc.replace("\r\n", "\n").strip()
+    # 在●后面紧跟的一个②或者③，它们的前面有\n
+    parts: list[str] = [f"{'●' if i else ''}{x}" for i, x in enumerate(desc.split("●"))]
+    for part in parts:
+        if not part.startswith('●'):
+            continue
+        index = len(part) - 1
+        for order in orders_without_first:
+            if (i := part.find(order)) != -1:
+                index = min(index, i)
+        if (i := part.find("【灵摆效果】")) != -1:
+            index = min(index, i)
+        if index != len(part) - 1 and part[index] != ch_separator[0]:
+            parts[parts.index(part)] = f"{part[:index]}\n{part[index:]}"
+    # merge parts
+    return reduce(lambda x, y: f"{x}{y}", parts)
 
 
 def unity(desc: str) -> str:
@@ -65,12 +85,14 @@ if __name__ == "__main__":
             unify_separator(
                 unify_pendulum_desc(
                     """
-        这张卡不能特殊召唤。这张卡通常召唤的场合，必须把3只解放作召唤。\r\n①：这张卡的召唤不会被无效化。\r\n②：在这张卡的召唤成功时，这张卡以外的魔法・陷阱・怪兽的效果不能发动。\r\n③：这张卡召唤成功时，把基本分支付到变成100基本分才能发动。这张卡的攻击力・守备力上升支付的数值。\r\n④：支付1000基本分，以场上1只怪兽为对象才能发动。那只怪兽破坏。
+        ①：1回合1次，可以从以下效果选择1个发动。\r\n●以自己场上1只「X-首领加农」为对象，把这张卡当作装备卡使用给那只怪兽装备。装备怪兽被战斗・效果破坏的场合，作为代替把这张卡破坏。\r\n●装备的这张卡特殊召唤。\r\n【灵摆效果】\r\n①：装备怪兽的攻击力・守备力上升400。
         """
                 )
             )
         ]
     )
+    print([unify_separator("①：1回合1次，可以从以下效果选择1个发动。\r\n●以自己场上1只「X-首领加农」为对象，把这张卡当作装备卡使用给那只怪兽装备。装备怪兽被战斗・效果破坏的场合，作为代替把这张卡破坏。\r\n●装备的这张卡特殊召唤。\r\n【灵摆效果】\r\n②：装备怪兽的攻击力・守备力上升400。")])
+    print([unify_separator("①：1回合1次，可以从以下效果选择1个发动。\r\n●以自己场上1只「X-首领加农」为对象，把这张卡当作装备卡使用给那只怪兽装备。装备怪兽被战斗・效果破坏的场合，作为代替把这张卡破坏。\r\n●装备的这张卡特殊召唤。\r\n②：装备怪兽的攻击力・守备力上升400。●装备的这张卡特殊召唤。\r\n\r\n③：装备怪兽的攻击力・守备力上升400。")])
 
 
 def card_translate(
@@ -95,16 +117,16 @@ def card_translate(
     for i, item in iterable:
         name_jp = item["name"]["ja-jp"]
         progress_update_cb(f"{i}/{len(card_raw_data)}")
-        if result_archived:= search_archived_data(name_jp):
+        if result_archived := search_archived_data(name_jp):
             # 在已归档数据中找到了对应的日文名
             item["name"]["custom"] = result_archived["name"]["custom"]
             item["desc"]["custom"] = unity(result_archived["desc"]["custom"])
             continue
-        if result_api_local:= api_local(name_jp):
+        if result_api_local := api_local(name_jp):
             # 在本地API中找到了对应的日文名
             item["name"]["custom"] = result_api_local["name"]
             item["desc"]["custom"] = unity(result_api_local["desc"])
-        if result_api:= api(name_jp, network_error_cb):
+        if result_api := api(name_jp, network_error_cb):
             # 在API中找到了对应的日文名
             item["name"]["custom"] = result_api["name"]
             item["desc"]["custom"] = unity(result_api["desc"])  # 修正灵摆...修正\r\n
