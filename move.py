@@ -1,6 +1,7 @@
+import os
 import shutil
 from os import path
-import os
+
 from utils import make_dir
 
 

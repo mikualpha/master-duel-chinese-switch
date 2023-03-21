@@ -1,5 +1,6 @@
 import zlib
 from typing import cast
+
 from hint import CardData
 
 

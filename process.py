@@ -1,5 +1,6 @@
 from hint import CardData, CardRawData, CardRawDataItem
 
+
 # Name Desc 的 start 分别是 0 4
 def progressiveProcess(
     b: bytes, b_indx: bytes, start: int, should_skip: bool = True
