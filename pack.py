@@ -23,7 +23,7 @@ def card_pack(card_encrypt_data: CardEncryptedData, dir_input: str, dir_output: 
                 name: str = data.name.upper()
                 # if name in ["CARD_PIDX"]:
                 #     continue
-                data.script = card_encrypt_data[name]
+                data.script = card_encrypt_data[name.replace('RUBY', '')]
                 data.save()
         createFolder(os.path.join(dir_output, file[:2]))
         with open(os.path.join(dir_output, file[:2], file), "wb") as f:

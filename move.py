@@ -26,19 +26,22 @@ def copy_to_original(
     """
     if output_to_local:
         # 本地输出
-        path_font_dst = path.join(".", "output", FONT_FILE_NAME[:2])
         make_dir(path.join(".", "output"))
         shutil.copytree(path_pack, path.join(".", "output"), dirs_exist_ok=True)
-        make_dir(path_font_dst)
-        shutil.copyfile(
-            path.join(
-                dir_font,
-                f"{FONT_FILE_NAME}_custom"
-                if custom_font
-                else f"{FONT_FILE_NAME}_zh_cn",
-            ),
-            path.join(path_font_dst, FONT_FILE_NAME),
-        )
+        for index, font in enumerate(fonts):
+            path_font_dst = path.join(".", "output", font[:2])
+            make_dir(path_font_dst)
+            shutil.copyfile(
+                path.join(
+                    dir_font,
+                    (f"{font}_custom"
+                    if custom_font
+                    else f"{font}_zh_cn")
+                    if index == 0
+                    else font,
+                ),
+                path.join(path_font_dst, font),
+            )
     else:
         # 输出到游戏目录
         path_local_data = path.join(path_game_root, "LocalData")
@@ -50,19 +53,25 @@ def copy_to_original(
 
 
 FONT_FILE_NAME = "f36fce47"
+FONT_FILE_NAME_EN = "ce4734d3"
+FONT_FILE_NAME_JP = "c09bd125"
+fonts = [FONT_FILE_NAME, FONT_FILE_NAME_EN, FONT_FILE_NAME_JP]
 
 
 def copy_font(path_game_root: str, dir_font: str, custom_font: bool = False):
     path_local_data = path.join(path_game_root, "LocalData")
     dirs = os.listdir(path_local_data)
-    for dir in dirs:
-        path_dst = path.join(path_local_data, dir, "0000", FONT_FILE_NAME[:2], FONT_FILE_NAME)
-        shutil.copyfile(
-            path.join(
-                dir_font,
-                f"{FONT_FILE_NAME}_custom"
-                if custom_font
-                else f"{FONT_FILE_NAME}_zh_cn",
-            ),
-            path_dst,
-        )
+    for index, font in enumerate(fonts):
+        for dir in dirs:
+            path_dst = path.join(path_local_data, dir, "0000", font[:2], font)
+            shutil.copyfile(
+                path.join(
+                    dir_font,
+                    (f"{font}_custom"
+                    if custom_font
+                    else f"{font}_zh_cn")
+                    if index == 0
+                    else font,
+                ),
+                path_dst,
+            )
