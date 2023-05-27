@@ -2,7 +2,7 @@
 
 [原项目地址](https://gitee.com/fetiss/master-duel-chinese-switch) | [原发布页](https://www.bilibili.com/read/cv21869124) | [API来源](https://ygocdb.com/)
 
-本项目是在作者[@叶lf](https://space.bilibili.com/23834819) / [@Timelic](https://space.bilibili.com/8664322) 的工作为基础进行的，在此表示感谢！
+本项目是在作者 [@叶lf](https://space.bilibili.com/23834819) / [@Timelic](https://space.bilibili.com/8664322) 工作的基础上进行的，在此表示感谢！
 
 ----
 
@@ -28,7 +28,7 @@
 
 
 ### 开发相关
-使用 `UnityPy` 解包，使用 `flet` 制作界面。
+本项目使用 `UnityPy` 解包，使用 `flet` 制作界面。
 
 ![](./images/display.jpg)
 #### 准备
