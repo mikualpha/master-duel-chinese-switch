@@ -25,8 +25,8 @@ def copy_to_local(path_game_root: str, path_resources: str, file_list: dict[str,
         game_data_path = path.join(path_game_root, "LocalData", LOCAL_DATA_KEY, "0000", prefix, file_path)
         local_data_dir = path.join(path_resources, prefix)
         local_data_path = path.join(path_resources, prefix, file_path)
-        recovery_dir = path.join(path_game_root, "_TranslationBackup", LOCAL_DATA_KEY, "0000", prefix)
-        recovery_path = path.join(path_game_root, "_TranslationBackup", LOCAL_DATA_KEY, "0000", prefix, file_path)
+        recovery_dir = path.join(".", "_TranslationBackup", LOCAL_DATA_KEY, "0000", prefix)
+        recovery_path = path.join(".", "_TranslationBackup", LOCAL_DATA_KEY, "0000", prefix, file_path)
         createFolder(local_data_dir)
         createFolder(recovery_dir)
 
@@ -52,16 +52,16 @@ def copy_to_original(
     复制path_pack下的所有文件和文件夹到path_dst，若存在则覆盖
     """
     if output_to_local:
-        # # 本地输出
-        # make_dir(path.join(".", "output"))
-        # shutil.copytree(path_pack, path.join(".", "output"), dirs_exist_ok=True)
+        make_dir(path.join(".", "output"))
+        shutil.copytree(path_pack, path.join(".", "output"), dirs_exist_ok=True)
+
         if custom_font:
             for index, font in enumerate(fonts):
                 path_font_dst = path.join(".", "output", font[:2])
                 make_dir(path_font_dst)
                 shutil.copyfile(  # 备份
                     path.join(path_font_dst, font),
-                    path.join(path_game_root, "_TranslationBackup", LOCAL_DATA_KEY, "0000", font[:2], font)
+                    path.join(".", "_TranslationBackup", LOCAL_DATA_KEY, "0000", font[:2], font)
                 )
                 shutil.copyfile(
                     path.join(
@@ -82,7 +82,7 @@ def copy_to_original(
             shutil.copytree(path_pack, path_dst, dirs_exist_ok=True)
             copy_font(path_game_root, dir_font, custom_font=custom_font)
         else:
-            recovery_dir = path.join(path_game_root, "_TranslationBackup", LOCAL_DATA_KEY, "0000")
+            recovery_dir = path.join(".", "_TranslationBackup", LOCAL_DATA_KEY, "0000")
             shutil.copytree(recovery_dir, path_dst, dirs_exist_ok=True)
 
 
