@@ -45,9 +45,9 @@ def progressiveProcess(
 
 
 def card_process(card_data: CardData) -> CardRawData:
-    CARD_Name_jp = progressiveProcess(
-        card_data["ja-jp"]["CARD_NAME"], card_data["ja-jp"]["CARD_INDX"], 0
-    )
+    # CARD_Name_jp = progressiveProcess(
+    #     card_data["ja-jp"]["CARD_NAME"], card_data["ja-jp"]["CARD_INDX"], 0
+    # )
     CARD_Name_zh = progressiveProcess(
         card_data["zh-cn"]["CARD_NAME"], card_data["zh-cn"]["CARD_INDX"], 0
     )
@@ -55,11 +55,19 @@ def card_process(card_data: CardData) -> CardRawData:
         card_data["zh-cn"]["CARD_DESC"], card_data["zh-cn"]["CARD_INDX"], 4
     )
     res: CardRawData = []
-    for i in range(len(CARD_Name_jp)):
+    for i in range(len(CARD_Name_zh)):
         tmp: CardRawDataItem = {
             "indx": i,
-            "name": {"ja-jp": CARD_Name_jp[i], "zh-cn": CARD_Name_zh[i], "custom": ""},
-            "desc": {"zh-cn": CARD_Desc_zh[i], "custom": ""},
+            "name": {
+                # "ja-jp": CARD_Name_jp[i],
+                "ja-jp": "",
+                "zh-cn": CARD_Name_zh[i],
+                "custom": ""
+            },
+            "desc": {
+                "zh-cn": CARD_Desc_zh[i],
+                "custom": ""
+            },
         }
         res.append(tmp)
     return res

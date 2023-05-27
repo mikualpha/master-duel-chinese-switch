@@ -102,9 +102,9 @@ def card_translate(
     network_error_cb: Callable[[], None] = lambda: None,
     dev_mode: bool = False,
 ) -> CardRawData:
-    def search_archived_data(name_jp: str) -> CardRawDataItem | None:
+    def search_archived_data(name_cn: str) -> CardRawDataItem | None:
         for item in archived_Data:
-            if item["name"]["ja-jp"] == name_jp:
+            if item["name"]["zh-cn"] == name_cn:
                 return item
         return None
 
@@ -115,25 +115,32 @@ def card_translate(
     )
 
     for i, item in iterable:
-        name_jp = item["name"]["ja-jp"]
+        # name_jp = item["name"]["ja-jp"]
+        name_md = item["name"]["zh-cn"]
         progress_update_cb(f"{i}/{len(card_raw_data)}")
-        if result_archived := search_archived_data(name_jp):
+        if result_archived := search_archived_data(name_md):
             # 在已归档数据中找到了对应的日文名
             item["name"]["custom"] = result_archived["name"]["custom"]
             item["desc"]["custom"] = unity(result_archived["desc"]["custom"])
             continue
-        if result_api_local := api_local(name_jp):
+        if result_api_local := api_local(name_md):
+            # print('API Local Found:', name_md)
+
             # 在本地API中找到了对应的日文名
             item["name"]["custom"] = result_api_local["name"]
             item["desc"]["custom"] = unity(result_api_local["desc"])
-        if result_api := api(name_jp, network_error_cb):
+            continue
+        if result_api := api(name_md, network_error_cb, dev_mode):
+            # print('API Remote Found:', name_md, result_api)
+
             # 在API中找到了对应的日文名
             item["name"]["custom"] = result_api["name"]
             item["desc"]["custom"] = unity(result_api["desc"])  # 修正灵摆...修正\r\n
             continue
         # 未找到对应的日文名
         if dev_mode:
-            tqdm.write(f"Can't find {name_jp}")
+            tqdm.write(f"WARN: Can't find {name_md}")
+            # print(f"WARN: Can't find {name_md}")
         item["name"]["custom"] = item["name"]["zh-cn"]
         item["desc"]["custom"] = item["desc"]["zh-cn"]
 

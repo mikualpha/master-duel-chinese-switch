@@ -1,6 +1,6 @@
 import os
 from typing import Any
-
+import shutil
 import UnityPy
 
 from hint import CardEncryptedData
@@ -14,9 +14,17 @@ def createFolder(path: str):
     if not isExists:
         os.makedirs(path)
 
+
 def card_pack(card_encrypt_data: CardEncryptedData, dir_input: str, dir_output: str):
-    for file in getFilesList(dir_input):
-        env = UnityPy.load(os.path.join(dir_input, file))
+    file_path_list = getFilesList(dir_input)
+
+    for file in file_path_list:
+        src_file = os.path.join(dir_input, file[:2], file)
+        dst_file = os.path.join(dir_output, file[:2], file)
+        createFolder(os.path.join(dir_output, file[:2]))
+        # shutil.copyfile(src_file, dst_file)
+
+        env = UnityPy.load(src_file)
         for obj in env.objects:
             if obj.type.name == "TextAsset":
                 data: Any = obj.read()
@@ -25,6 +33,6 @@ def card_pack(card_encrypt_data: CardEncryptedData, dir_input: str, dir_output: 
                 #     continue
                 data.script = card_encrypt_data[name.replace('RUBY', '')]
                 data.save()
-        createFolder(os.path.join(dir_output, file[:2]))
-        with open(os.path.join(dir_output, file[:2], file), "wb") as f:
+
+        with open(os.path.join(dst_file), "wb") as f:
             f.write(env.file.save())
