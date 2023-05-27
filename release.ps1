@@ -1,1 +1,1 @@
-flet pack ".\interface.py" --add-data "unity;UnityPy/resources" --add-data "resources;resources" --add-data "input;input" --name "MD æ±‰åŒ–ç‰ˆæœ¬åˆ‡æ¢" --icon "images/icon.png"
+flet pack ".\interface.py" --add-data "unity;UnityPy/resources" --add-data "resources;resources" --add-data "input;input" --name "MD ºº»¯°æ±¾ÇĞ»»R" --icon "images/icon.png"

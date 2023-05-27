@@ -8,7 +8,7 @@ import flet as ft
 from index import main as install_trans
 from utils import get_logger, throttle
 
-RELEASE_URL = "https://www.bilibili.com/read/cv21869124" 
+RELEASE_URL = "https://github.com/mikualpha/master-duel-chinese-switch"
 
 def log(e: Any) -> None:
     get_logger().error(e, stack_info=True)
@@ -135,7 +135,7 @@ def main(page: ft.Page):
     选项：翻译类型和字体
     """
     use_custom_trans: bool = True
-    use_custom_font: bool = True
+    use_custom_font: bool = False
     output_to_local: bool = False
 
     def on_click_c1(e: ft.FilePickerResultEvent):
@@ -147,7 +147,7 @@ def main(page: ft.Page):
     def on_click_c2(e: ft.FilePickerResultEvent):
         nonlocal use_custom_font
         use_custom_font = e.data == "true"
-        c2.label = "使用隶书卡片字体" if use_custom_font else "使用楷书卡片字体"
+        c2.label = "使用隶书卡片字体（目前有BUG请使用楷书）" if use_custom_font else "使用楷书卡片字体"
         c2.update()
     
     def on_click_c3(e: ft.FilePickerResultEvent):
@@ -157,7 +157,7 @@ def main(page: ft.Page):
         c3.update()
 
     c1 = ft.Checkbox(label="使用汉化组卡片翻译", value=True, on_change=on_click_c1)
-    c2 = ft.Checkbox(label="使用隶书卡片字体", value=True, on_change=on_click_c2)
+    c2 = ft.Checkbox(label="使用楷书卡片字体", value=False, on_change=on_click_c2)
     c3 = ft.Checkbox(label="不输出到本地目录", value=False, on_change=on_click_c3)
 
     """

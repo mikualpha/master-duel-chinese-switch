@@ -7,8 +7,10 @@ from typing import Callable, ParamSpec, TypeVar
 
 def getFilesList(path: str) -> list[str]:
     res: list[str] = []
-    for _, _, files in os.walk(path):
-        res = files  # 文件名称，返回list类型
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            # file_path = os.path.join(root, file)
+            res.append(file)  # 文件名称
     return res
 
 
@@ -96,3 +98,7 @@ def get_logger() -> logging.Logger:
     logger.addHandler(stdout_handler)
 
     return logger
+
+
+if __name__ == '__main__':
+    print(getFilesList('src'))

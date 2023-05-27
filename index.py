@@ -23,29 +23,49 @@ def main(
     custom_trans: bool = True,
     custom_font: bool = False,
     output_to_local: bool = False,
-    dev_mode: bool = True,
+    dev_mode: bool = False,
 ):
+    # PATH: 13e52c576428a1ef
+    file_list = {
+        'CN': {
+            'CARD_Desc': '1708dd20',
+            'CARD_Indx': '66d1a766',
+            'CARD_Name': '429e0f72',
+            'CARD_Part': '64d55f4e',
+            'Card_Pidx': '7fe8f70a',
+            # 'CARD_Genre': 'd4243bac',
+            # 'CARD_IntID': 'dd7fdb0c',
+            # 'CARD_Link': '2a11e885',
+            # 'CARD_Named': '2694c4d3',
+        }
+    }
+
     try:
         make_dir(get_resource_path("output"))
         set_status_msg("安装中...")
 
         # 首先 copy到本地
         set_status(Status.obtaining)
-        path_data_unity3d = copy_to_local(path_game_root, get_resource_path("."))
+        path_data_unity3d = copy_to_local(path_game_root,
+                                          get_resource_path("src"),
+                                          file_list['CN'],
+                                          dev_mode=dev_mode)
 
         set_status(Status.unpacking)
         card_data = card_unpack(path_data_unity3d)
 
         set_status(Status.cracking)
-
-        m_iCryptoKey = crack_key(card_data["ja-jp"]["CARD_NAME"])
-        # m_iCryptoKey = 63  # 现在为了减少时间先写死...
+        m_iCryptoKey = crack_key(card_data["zh-cn"]["CARD_NAME"])
+        # m_iCryptoKey = 95  # 现在为了减少时间先写死...
+        # print("m_iCryptoKey =", m_iCryptoKey)
 
         set_status(Status.decrypting)
         card_data = card_decrypt(card_data, m_iCryptoKey)
+        # print('CardData:', card_data)
 
         set_status(Status.processing)
         card_raw_data = card_process(card_data)
+        # print('CardRawData:', card_raw_data)
 
         with open(
             path.join(get_resource_path("resources"), "card.json"), "r", encoding="utf8"
@@ -72,7 +92,7 @@ def main(
 
         set_status(Status.packing)
         card_pack(
-            card_encrypt_data, get_resource_path("input"), get_resource_path("output")
+            card_encrypt_data, get_resource_path("src"), get_resource_path("output")
         )
 
         # 复制回去
@@ -82,6 +102,7 @@ def main(
             path_pack=get_resource_path("output"),
             dir_font=get_resource_path("resources"),
             custom_font=custom_font,
+            custom_trans=custom_trans,
             output_to_local=output_to_local,
         )
 
@@ -96,6 +117,7 @@ def main(
         set_status_msg('请以管理员身份运行本程序，\n或者勾选下面的"输出到本地目录"。')
 
     except Exception as e:
+        # raise e
         print(e)
         log(str(e))
         set_status(Status.failed)
@@ -104,8 +126,9 @@ def main(
 if __name__ == "__main__":
     # 测试
     main(
-        r"E:\Program Files (x86)\Steam\steamapps\common\Yu-Gi-Oh!  Master Duel",
-        custom_trans=False,
+        r"F:\SteamLibrary\steamapps\common\Yu-Gi-Oh!  Master Duel",
+        custom_trans=True,
         custom_font=False,
-        output_to_local=True
+        output_to_local=False,  # 是否仅输出到本地
+        dev_mode=True,
     )
