@@ -12,11 +12,13 @@
 
 如果出现报错或闪退可提issue，**欢迎有兴趣的童鞋提PR~~~**
 
+**若认为此项目对您有帮助可考虑给项目点个`Star`，谢谢~**
+
 ----
 ### 使用方式
 前往[Releases页面](https://github.com/mikualpha/master-duel-chinese-switch/releases)下载`MDTR_vx.x.x.exe`后，同时参考本项目README和原项目发布页使用。
 
-如`MDTR_vx.x.x.exe`使用不稳定，可以下载离线补丁`OfflinePatch.zip`，并使用与其它MOD类似的方式覆盖到游戏目录下(但此方式存在有效期，翻译被游戏更新覆盖后，请勿再次安装旧zip)。
+如`MDTR_vx.x.x.exe`使用不稳定，可以使用离线补丁`OfflinePatch.zip`，将其覆盖到游戏目录下(与其它MOD类似，但此方式存在有效期，翻译被游戏更新覆盖后，请勿再次安装旧Zip)。
 
 ### 注意事项
 1. 因为文件结构发生了变化，使用本地替换的话请把`output`下的所有文件夹替换至游戏目录`LocalData/[随机8位16进制数]/0000`文件夹下(应该粘贴时有覆盖提示)；
