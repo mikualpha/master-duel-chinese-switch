@@ -101,6 +101,7 @@ def main(
             path_game_root,
             path_pack=get_resource_path("output"),
             dir_font=get_resource_path("resources"),
+            file_list=file_list['CN'],
             custom_font=custom_font,
             custom_trans=custom_trans,
             output_to_local=output_to_local,
