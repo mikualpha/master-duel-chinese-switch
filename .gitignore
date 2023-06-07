@@ -12,3 +12,5 @@ generated-*
 *logs.txt
 
 !.gitkeep
+
+resources/*.py

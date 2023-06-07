@@ -106,10 +106,14 @@ def copy_to_original(
                 shutil.copytree(recovery_dir, path_dst, dirs_exist_ok=True)
 
 
-FONT_FILE_NAME = "f36fce47"
-FONT_FILE_NAME_EN = "ce4734d3"
-FONT_FILE_NAME_JP = "c09bd125"
-fonts = [FONT_FILE_NAME, FONT_FILE_NAME_EN, FONT_FILE_NAME_JP]
+FONT_CARD_FILE_NAME_CN = "f36fce47"
+FONT_SDF_FILE_NAME_CN = "7a7d18a0"  # Font SDF Atlas
+FONT_CARD_FILE_NAME_EN = "ce4734d3"
+FONT_CARD_FILE_NAME_JP = "c09bd125"
+fonts = [FONT_CARD_FILE_NAME_CN, FONT_SDF_FILE_NAME_CN,  # 字体文件列表
+         FONT_CARD_FILE_NAME_EN,
+         FONT_CARD_FILE_NAME_JP]
+custom_fonts = [FONT_CARD_FILE_NAME_CN, FONT_SDF_FILE_NAME_CN]  # 有Custom版本的文件
 
 
 def copy_font_to_local(path_game_root: str, data_key: str, dir_font: str, custom_font: bool = False):
@@ -132,7 +136,7 @@ def copy_font_to_local(path_game_root: str, data_key: str, dir_font: str, custom
                 (f"{font}_custom"
                  if custom_font
                  else f"{font}_zh_cn")
-                if index == 0
+                if font in custom_fonts
                 else font,
             ),
             path.join(path_font_dst, font),
