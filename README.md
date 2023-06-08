@@ -19,7 +19,7 @@
 ## 使用方式
 前往[Releases页面](https://github.com/mikualpha/master-duel-chinese-switch/releases)下载`MDTR_vx.x.x.exe`，同时参考本项目README和原项目发布页使用。
 
-（因`MDTR_vx.x.x.exe`已能正常使用，短期内不再提供离线补丁`OfficialPatch.zip`）
+（因为`MDTR_vx.x.x.exe`已能正常使用，短期内不制作离线补丁包`OfflinePatch.zip`了）
 
 ### 注意事项
 1. 因为文件结构发生了变化，使用本地替换的话请把`output`下的所有文件夹替换至游戏目录`LocalData/[随机8位16进制数]/0000`文件夹下（粘贴时应该有覆盖提示）；
