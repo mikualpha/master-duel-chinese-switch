@@ -12,6 +12,7 @@ from process import card_process
 from translate import card_translate
 from unpack import card_unpack
 from utils import make_dir, get_resource_path
+from search import search_card_obj_list
 
 
 def main(
@@ -24,23 +25,24 @@ def main(
     custom_font: bool = False,
     output_to_local: bool = False,
     dev_mode: bool = False,
+    search_card_obj: bool = False,
 ):
     # PATH: 13e52c576428a1ef
-    file_list = {
+    file_list = {  # Generate from search.py
         'CN': {
             'CARD_Desc': '1708dd20',
             'CARD_Indx': '66d1a766',
             'CARD_Name': '429e0f72',
             'CARD_Part': '64d55f4e',
             'Card_Pidx': '7fe8f70a',
-            # 'CARD_Genre': 'd4243bac',
-            # 'CARD_IntID': 'dd7fdb0c',
-            # 'CARD_Link': '2a11e885',
-            # 'CARD_Named': '2694c4d3',
         }
     }
 
     try:
+        if search_card_obj:  # 是否需要搜索文件
+            set_status_msg("扫描文件中(需较长时间)...")
+            file_list['CN'] = search_card_obj_list(path_game_root)
+
         make_dir(get_resource_path("output"))
         set_status_msg("安装中...")
 
@@ -105,6 +107,7 @@ def main(
             custom_font=custom_font,
             custom_trans=custom_trans,
             output_to_local=output_to_local,
+            dev_mode=dev_mode
         )
 
         set_status(Status.success)
@@ -130,6 +133,7 @@ if __name__ == "__main__":
         r"F:\SteamLibrary\steamapps\common\Yu-Gi-Oh!  Master Duel",
         custom_trans=True,
         custom_font=False,
-        output_to_local=False,  # 是否仅输出到本地
+        output_to_local=True,  # 是否仅输出到本地
         dev_mode=True,
+        search_card_obj=False,
     )

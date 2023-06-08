@@ -4,6 +4,8 @@ from os import path
 
 from utils import make_dir
 
+BACKUP_FOLDER_NAME = "_TranslationBackup"
+
 
 def get_local_data_key(path_game_root: str, file_list: dict[str, str]):
     path_local_data = path.join(path_game_root, "LocalData")
@@ -44,16 +46,18 @@ def copy_to_local(path_game_root: str, path_resources: str, file_list: dict[str,
             game_data_path = path.join(path_game_root, "LocalData", data_key, "0000", prefix, file_name)
             local_data_dir = path.join(path_resources, prefix)
             local_data_path = path.join(path_resources, prefix, file_name)
-            recovery_dir = path.join(".", "_TranslationBackup", data_key, "0000", prefix)
-            recovery_path = path.join(".", "_TranslationBackup", data_key, "0000", prefix, file_name)
             createFolder(local_data_dir)
-            createFolder(recovery_dir)
+
+            if not dev_mode:  # 非开发环境下进行备份
+                recovery_dir = path.join(".", BACKUP_FOLDER_NAME, data_key, "0000", prefix)
+                recovery_path = path.join(".", BACKUP_FOLDER_NAME, data_key, "0000", prefix, file_name)
+                createFolder(recovery_dir)
+
+                if not os.path.exists(recovery_path):  # 备份一份
+                    shutil.copyfile(game_data_path, recovery_path)
 
             if not dev_mode or not os.path.exists(local_data_path):
                 shutil.copyfile(game_data_path, local_data_path)
-
-            if not os.path.exists(recovery_path):  # 备份一份
-                shutil.copyfile(game_data_path, recovery_path)
 
             local_file_name_list.setdefault(data_key, {})
             local_file_name_list[data_key][file_type] = local_data_path
@@ -78,6 +82,7 @@ def copy_to_original(
     custom_font: bool = False,
     custom_trans: bool = True,
     output_to_local: bool = False,
+    dev_mode: bool = False,
 ) -> None:
     """
     复制path_pack下的所有文件和文件夹到path_dst，若存在则覆盖
@@ -89,7 +94,7 @@ def copy_to_original(
             shutil.copytree(path_pack, path.join(".", "output"), dirs_exist_ok=True)
 
             if custom_font:  # 这里先拦一下
-                copy_font_to_local(path_game_root, data_key, dir_font, custom_font=custom_font)
+                copy_font_to_local(path_game_root, data_key, dir_font, custom_font=custom_font, dev_mode=dev_mode)
         else:
             # 输出到游戏目录
             path_local_data = path.join(path_game_root, "LocalData")
@@ -100,9 +105,9 @@ def copy_to_original(
                 shutil.copytree(path_pack, path_dst, dirs_exist_ok=True)
 
                 # 输出字体
-                copy_font(path_game_root, data_key, dir_font, custom_font=custom_font)
-            else:
-                recovery_dir = path.join(".", "_TranslationBackup", data_key, "0000")
+                copy_font(path_game_root, data_key, dir_font, custom_font=custom_font, dev_mode=dev_mode)
+            elif not dev_mode:
+                recovery_dir = path.join(".", BACKUP_FOLDER_NAME, data_key, "0000")
                 shutil.copytree(recovery_dir, path_dst, dirs_exist_ok=True)
 
 
@@ -110,13 +115,14 @@ FONT_CARD_FILE_NAME_CN = "f36fce47"
 FONT_SDF_FILE_NAME_CN = "7a7d18a0"  # Font SDF Atlas
 FONT_CARD_FILE_NAME_EN = "ce4734d3"
 FONT_CARD_FILE_NAME_JP = "c09bd125"
-fonts = [FONT_CARD_FILE_NAME_CN, FONT_SDF_FILE_NAME_CN,  # 字体文件列表
+fonts = (FONT_CARD_FILE_NAME_CN, FONT_SDF_FILE_NAME_CN,  # 字体文件列表
          FONT_CARD_FILE_NAME_EN,
-         FONT_CARD_FILE_NAME_JP]
-custom_fonts = [FONT_CARD_FILE_NAME_CN, FONT_SDF_FILE_NAME_CN]  # 有Custom版本的文件
+         FONT_CARD_FILE_NAME_JP)
+custom_fonts = (FONT_CARD_FILE_NAME_CN, FONT_SDF_FILE_NAME_CN)  # 有Custom版本的文件
 
 
-def copy_font_to_local(path_game_root: str, data_key: str, dir_font: str, custom_font: bool = False):
+def copy_font_to_local(path_game_root: str, data_key: str, dir_font: str, custom_font: bool = False,
+                       dev_mode: bool = False):
     for index, font in enumerate(fonts):
         dst_path = path.join(path_game_root, "LocalData", data_key, "0000", font[:2], font)
         # if not os.path.exists(dst_path):  # 目标文件不存在(说明可能是无效的data_key)
@@ -125,44 +131,44 @@ def copy_font_to_local(path_game_root: str, data_key: str, dir_font: str, custom
         path_font_dst = path.join(".", "output", font[:2])
         make_dir(path_font_dst)
 
-        createFolder(path.join(".", "_TranslationBackup", data_key, "0000", font[:2]))
-        shutil.copyfile(  # 备份
-            dst_path,
-            path.join(".", "_TranslationBackup", data_key, "0000", font[:2], font)
-        )
-        shutil.copyfile(  # 输出到output
-            path.join(
-                dir_font,
-                (f"{font}_custom"
-                 if custom_font
-                 else f"{font}_zh_cn")
-                if font in custom_fonts
-                else font,
-            ),
+        if not dev_mode:  # 非开发环境下进行备份
+            createFolder(path.join(".", BACKUP_FOLDER_NAME, data_key, "0000", font[:2]))
+            shutil.copyfile(  # 备份
+                dst_path,
+                path.join(".", BACKUP_FOLDER_NAME, data_key, "0000", font[:2], font)
+            )
+
+        # 输出到output
+        if font in custom_fonts:
+            src_filename = f"{font}_custom" if custom_font else f"{font}_zh_cn"
+        else:
+            src_filename = font
+        shutil.copyfile(
+            path.join(dir_font, src_filename),
             path.join(path_font_dst, font),
         )
 
 
-def copy_font(path_game_root: str, data_key: str, dir_font: str, custom_font: bool = False):
+def copy_font(path_game_root: str, data_key: str, dir_font: str, custom_font: bool = False, dev_mode: bool = False):
     path_local_data = path.join(path_game_root, "LocalData")
     for index, font in enumerate(fonts):
         dst_path = path.join(path_local_data, data_key, "0000", font[:2], font)
         # if not os.path.exists(dst_path):  # 目标文件不存在(说明可能是无效的data_key)
         #     return
 
-        createFolder(path.join(".", "_TranslationBackup", data_key, "0000", font[:2]))
-        shutil.copyfile(  # 备份
-            dst_path,
-            path.join(".", "_TranslationBackup", data_key, "0000", font[:2], font)
-        )
-        shutil.copyfile(  # 输出到游戏目录
-            path.join(
-                dir_font,
-                (f"{font}_custom"
-                if custom_font
-                else f"{font}_zh_cn")
-                if index == 0
-                else font,
-            ),
-            dst_path,
+        if not dev_mode:  # 非开发环境下进行备份
+            createFolder(path.join(".", BACKUP_FOLDER_NAME, data_key, "0000", font[:2]))
+            shutil.copyfile(  # 备份
+                dst_path,
+                path.join(".", BACKUP_FOLDER_NAME, data_key, "0000", font[:2], font)
+            )
+
+        # 输出到游戏目录
+        if font in custom_fonts:
+            src_filename = f"{font}_custom" if custom_font else f"{font}_zh_cn"
+        else:
+            src_filename = font
+        shutil.copyfile(
+            path.join(dir_font, src_filename),
+            dst_path
         )
