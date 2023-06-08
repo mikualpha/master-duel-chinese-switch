@@ -61,7 +61,7 @@ class CacheManager(object):
     @classmethod
     def save_cache(cls):
         with open(path.join(get_resource_path("resources"), cls.CACHE_FILE_NAME), "w", encoding="utf-8") as f:
-            f.write(json.dumps(cls.cardCache))
+            f.write(json.dumps(cls.cardCache, ensure_ascii=False))
 
     @classmethod
     def load_cache(cls) -> dict[str, CardsCache]:
@@ -108,8 +108,9 @@ def api_local(search: str) -> Union[NameDesc, None]:
 def api(
     search: str, network_error_cb: Callable[[], None] = lambda: None, dev_mode: bool = False,
 ) -> Union[NameDesc, None, NoReturn]:
-    if dev_mode:
-        return None
+    if not dev_mode and search.endswith("衍生物"):
+        return None  # YGOCDB不收录衍生物
+
     # 全角转半角
     search = q2b_string(search)
     search = search.replace(' ', ' ')  # 处理NBSP空格问题
