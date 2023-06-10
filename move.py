@@ -82,6 +82,7 @@ def copy_to_original(
     custom_font: bool = False,
     custom_trans: bool = True,
     output_to_local: bool = False,
+    fix_missing_glyph: bool = False,
     dev_mode: bool = False,
 ) -> None:
     """
@@ -93,22 +94,33 @@ def copy_to_original(
             make_dir(path.join(".", "output"))
             shutil.copytree(path_pack, path.join(".", "output"), dirs_exist_ok=True)
 
-            if custom_font:  # 这里先拦一下
-                copy_font_to_local(path_game_root, data_key, dir_font, custom_font=custom_font, dev_mode=dev_mode)
+            if not dev_mode:  # 开发模式不污染output文件夹
+                # 隶书
+                copy_font_to_local(path_game_root, data_key, dir_font, list(normal_fonts), custom_font=custom_font,
+                                   dev_mode=dev_mode)
+                # 修复字体
+                copy_font_to_local(path_game_root, data_key, dir_font, list(fix_fonts),
+                                   custom_font=fix_missing_glyph,
+                                   dev_mode=dev_mode)
         else:
             # 输出到游戏目录
             path_local_data = path.join(path_game_root, "LocalData")
             path_dst = path.join(path_local_data, data_key, "0000")
 
+            # 输出翻译
             if custom_trans:
-                # 输出翻译
                 shutil.copytree(path_pack, path_dst, dirs_exist_ok=True)
-
-                # 输出字体
-                copy_font(path_game_root, data_key, dir_font, custom_font=custom_font, dev_mode=dev_mode)
-            elif not dev_mode:
+            elif not dev_mode:  # 开发模式没有备份文件夹
                 recovery_dir = path.join(".", BACKUP_FOLDER_NAME, data_key, "0000")
                 shutil.copytree(recovery_dir, path_dst, dirs_exist_ok=True)
+
+            # 输出字体
+            copy_font(path_game_root, data_key, dir_font, list(normal_fonts),
+                      custom_font=custom_font, dev_mode=dev_mode)
+
+            # 修复字体
+            copy_font(path_game_root, data_key, dir_font, list(fix_fonts),
+                      custom_font=fix_missing_glyph, dev_mode=dev_mode)
 
 
 FONT_CARD_FILE_NAME_CN = "f36fce47"     # FZBWKSJW
@@ -118,16 +130,21 @@ FONT_CARD_FILE_NAME_JP = "c09bd125"
 FONT_UI_509R_FILE_NAME_CN = "25946b17"  # FZYouHJW_509R
 FONT_UI_512R_FILE_NAME_CN = "da15c88f"  # FZYouHJW_512R
 
-# 字体文件列表
-fonts = (FONT_CARD_FILE_NAME_CN, SDF_CARD_FILE_NAME_CN, FONT_UI_509R_FILE_NAME_CN, FONT_UI_512R_FILE_NAME_CN,
-         FONT_CARD_FILE_NAME_EN,
-         FONT_CARD_FILE_NAME_JP)
+# 替换必需的字体文件列表
+normal_fonts = (FONT_CARD_FILE_NAME_CN, SDF_CARD_FILE_NAME_CN,
+                FONT_CARD_FILE_NAME_EN,
+                FONT_CARD_FILE_NAME_JP)
+
+# 修复缺字问题的字体文件列表
+# 目前需要修复的字：魊
+fix_fonts = (FONT_UI_509R_FILE_NAME_CN, FONT_UI_512R_FILE_NAME_CN)
+
 # 有Custom版本的文件列表
 custom_fonts = (FONT_CARD_FILE_NAME_CN, SDF_CARD_FILE_NAME_CN,
                 FONT_UI_509R_FILE_NAME_CN, FONT_UI_512R_FILE_NAME_CN)
 
 
-def copy_font_to_local(path_game_root: str, data_key: str, dir_font: str, custom_font: bool = False,
+def copy_font_to_local(path_game_root: str, data_key: str, dir_font: str, fonts: list[str], custom_font: bool = False,
                        dev_mode: bool = False):
     for index, font in enumerate(fonts):
         dst_path = path.join(path_game_root, "LocalData", data_key, "0000", font[:2], font)
@@ -155,7 +172,8 @@ def copy_font_to_local(path_game_root: str, data_key: str, dir_font: str, custom
         )
 
 
-def copy_font(path_game_root: str, data_key: str, dir_font: str, custom_font: bool = False, dev_mode: bool = False):
+def copy_font(path_game_root: str, data_key: str, dir_font: str, fonts: list[str], custom_font: bool = False,
+              dev_mode: bool = False):
     path_local_data = path.join(path_game_root, "LocalData")
     for index, font in enumerate(fonts):
         dst_path = path.join(path_local_data, data_key, "0000", font[:2], font)

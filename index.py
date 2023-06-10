@@ -24,6 +24,7 @@ def main(
     custom_trans: bool = True,
     custom_font: bool = False,
     output_to_local: bool = False,
+    fix_missing_glyph: bool = False,
     dev_mode: bool = False,
     search_card_obj: bool = False,
 ):
@@ -107,6 +108,7 @@ def main(
             custom_font=custom_font,
             custom_trans=custom_trans,
             output_to_local=output_to_local,
+            fix_missing_glyph=fix_missing_glyph,
             dev_mode=dev_mode
         )
 
