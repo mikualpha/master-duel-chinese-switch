@@ -111,14 +111,20 @@ def copy_to_original(
                 shutil.copytree(recovery_dir, path_dst, dirs_exist_ok=True)
 
 
-FONT_CARD_FILE_NAME_CN = "f36fce47"
-FONT_SDF_FILE_NAME_CN = "7a7d18a0"  # Font SDF Atlas
+FONT_CARD_FILE_NAME_CN = "f36fce47"     # FZBWKSJW
+SDF_CARD_FILE_NAME_CN = "7a7d18a0"      # FZBWKSJW - Font SDF Atlas
 FONT_CARD_FILE_NAME_EN = "ce4734d3"
 FONT_CARD_FILE_NAME_JP = "c09bd125"
-fonts = (FONT_CARD_FILE_NAME_CN, FONT_SDF_FILE_NAME_CN,  # 字体文件列表
+FONT_UI_509R_FILE_NAME_CN = "25946b17"  # FZYouHJW_509R
+FONT_UI_512R_FILE_NAME_CN = "da15c88f"  # FZYouHJW_512R
+
+# 字体文件列表
+fonts = (FONT_CARD_FILE_NAME_CN, SDF_CARD_FILE_NAME_CN, FONT_UI_509R_FILE_NAME_CN, FONT_UI_512R_FILE_NAME_CN,
          FONT_CARD_FILE_NAME_EN,
          FONT_CARD_FILE_NAME_JP)
-custom_fonts = (FONT_CARD_FILE_NAME_CN, FONT_SDF_FILE_NAME_CN)  # 有Custom版本的文件
+# 有Custom版本的文件列表
+custom_fonts = (FONT_CARD_FILE_NAME_CN, SDF_CARD_FILE_NAME_CN,
+                FONT_UI_509R_FILE_NAME_CN, FONT_UI_512R_FILE_NAME_CN)
 
 
 def copy_font_to_local(path_game_root: str, data_key: str, dir_font: str, custom_font: bool = False,
