@@ -32,10 +32,11 @@ class CacheManager(object):
     cardCache: dict[str, CardsCache] = {}
 
     @classmethod
-    def add_cache(cls, jp_name: str = '', cn_name: str = '', en_name: str = '', jp_ruby: str = '',
+    def add_cache(cls, card_id: int, jp_name: str = '', cn_name: str = '', en_name: str = '', jp_ruby: str = '',
                   nw_name: str = '', sc_name: str = '', md_name: str = '', cnocg_n: str = '', nwbbs_n: str = '',
-                  custom_desc: str = ''):
+                  original_desc: str = '', custom_desc: str = ''):
         cache_obj = {
+            "id": card_id,
             "name": {
                     "jp_name": jp_name,
                     "cn_name": cn_name,
@@ -48,7 +49,7 @@ class CacheManager(object):
                     "nwbbs_n": nwbbs_n
             },
             "desc": {
-                # "md_desc": CARD_Desc_zh[i],
+                "zh-cn": original_desc,
                 "custom": custom_desc
             }
         }
@@ -61,7 +62,7 @@ class CacheManager(object):
     @classmethod
     def save_cache(cls):
         with open(path.join(get_resource_path("resources"), cls.CACHE_FILE_NAME), "w", encoding="utf-8") as f:
-            f.write(json.dumps(cls.cardCache, ensure_ascii=False))
+            f.write(json.dumps(cls.cardCache, ensure_ascii=False, separators=(',', ':')))
 
     @classmethod
     def load_cache(cls) -> dict[str, CardsCache]:
@@ -69,13 +70,16 @@ class CacheManager(object):
             # print('Load Cache: ', len(cls.cardCache))
             return cls.cardCache
 
-        with open(path.join(get_resource_path("resources"), cls.CACHE_FILE_NAME), encoding="utf-8") as f:
-            file_content = f.read().strip()
-            if len(file_content) <= 0:
-                return cls.cardCache
+        try:
+            with open(path.join(get_resource_path("resources"), cls.CACHE_FILE_NAME), encoding="utf-8") as f:
+                file_content = f.read().strip()
+                if len(file_content) <= 0:
+                    return cls.cardCache
 
-            cls.cardCache = json.loads(file_content)
-            # print('Load Success: ', len(cls.cardCache))
+                cls.cardCache = json.loads(file_content)
+                # print('Load Success: ', len(cls.cardCache))
+        except Exception as e:
+            cls.cardCache = {}
         return cls.cardCache
 
 
@@ -106,13 +110,13 @@ def api_local(search: str) -> Union[NameDesc, None]:
 
 
 def api(
-    search: str, network_error_cb: Callable[[], None] = lambda: None, dev_mode: bool = False,
+    search: str, desc_src: str, network_error_cb: Callable[[], None] = lambda: None, dev_mode: bool = False,
 ) -> Union[NameDesc, None, NoReturn]:
     if not dev_mode and search.endswith("衍生物"):
         return None  # YGOCDB不收录衍生物
 
     # 全角转半角
-    search = q2b_string(search)
+    # search = q2b_string(search)
     search = search.replace(' ', ' ')  # 处理NBSP空格问题
 
     def helper(search: str) -> Union[NameDesc, None, NoReturn]:
@@ -131,15 +135,17 @@ def api(
             desc = f"{desc}\n【灵摆效果】\n{p_desc}"
 
         if dev_mode:
-            CacheManager.add_cache(jp_name=item["jp_name"] if 'jp_name' in item else '',
-                                   cn_name=item['cn_name'] if 'cn_name' in item else '',
-                                   en_name=item['en_name'] if 'en_name' in item else '',
-                                   jp_ruby=item['jp_ruby'] if 'jp_ruby' in item else '',
-                                   nw_name=item['nw_name'] if 'nw_name' in item else '',
-                                   sc_name=item['sc_name'] if 'sc_name' in item else '',
-                                   md_name=item['md_name'] if 'md_name' in item else '',
-                                   cnocg_n=item['cnocg_n'] if 'cnocg_n' in item else '',
-                                   nwbbs_n=item['nwbbs_n'] if 'nwbbs_n' in item else '',
+            CacheManager.add_cache(item.get("id", -1),
+                                   jp_name=item.get('jp_name', ''),
+                                   cn_name=item.get('cn_name', ''),
+                                   en_name=item.get('en_name', ''),
+                                   jp_ruby=item.get('jp_ruby', ''),
+                                   nw_name=item.get('nw_name', ''),
+                                   sc_name=item.get('sc_name', ''),
+                                   md_name=item.get('md_name', ''),
+                                   cnocg_n=item.get('cnocg_n', ''),
+                                   nwbbs_n=item.get('nwbbs_n', ''),
+                                   original_desc=desc_src,
                                    custom_desc=desc)
         return {"name": name, "desc": desc}
 
