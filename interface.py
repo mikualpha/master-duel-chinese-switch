@@ -154,7 +154,7 @@ def main(page: ft.Page):
     def on_click_c3(e: ft.FilePickerResultEvent):
         nonlocal fix_missing_glyph
         fix_missing_glyph = e.data == "true"
-        c3.label = "尝试修复缺字问题" if fix_missing_glyph else "不进行缺字问题修复"
+        c3.label = "尝试修复缺字问题(Beta)" if fix_missing_glyph else "不进行缺字问题修复"
         c3.update()
     
     def on_click_c4(e: ft.FilePickerResultEvent):
@@ -165,7 +165,7 @@ def main(page: ft.Page):
 
     c1 = ft.Checkbox(label="使用汉化组卡片翻译", value=True, on_change=on_click_c1)
     c2 = ft.Checkbox(label="使用隶书卡片字体", value=True, on_change=on_click_c2)
-    c3 = ft.Checkbox(label="尝试修复缺字问题", value=True, on_change=on_click_c3)
+    c3 = ft.Checkbox(label="尝试修复缺字问题(Beta)", value=True, on_change=on_click_c3)
     c4 = ft.Checkbox(label="不输出到本地目录", value=False, on_change=on_click_c4)
 
 

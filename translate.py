@@ -102,10 +102,42 @@ def card_translate(
     network_error_cb: Callable[[], None] = lambda: None,
     dev_mode: bool = False,
 ) -> CardRawData:
-    def search_archived_data(name_cn: str) -> CardRawDataItem | None:
+
+    # 统计同名卡的函数
+    # card_name = {}
+    # def stat_repeat_card_name(name_md: str, desc_md: str):
+    #     if name_md not in card_name:
+    #         card_name[name_md] = desc_md
+    #     elif desc_md == card_name[name_md]:
+    #         pass
+    #     else:
+    #         success = 0
+    #         for x in archived_Data:
+    #             if x["name"]["zh-cn"] == name_md:
+    #                 if x["desc"]["zh-cn"] == desc_md:
+    #                     success += 1
+    #                 elif x["desc"]["zh-cn"] == card_name[name_md]:
+    #                     success += 1
+    #
+    #                 if success >= 2:
+    #                     print('Need Add to list:', name_md)
+    #                     break
+    #
+    #         if success < 2:
+    #             print('Error:', name_md, "\n", desc_md, "\n", card_name[name_md])
+    #             print('')
+
+    # 某些日文不同卡名但中文翻译翻成同卡名的玩意
+    special_card_name = {'礼品卡', '魔法神灯', '骷髅骑士', '混沌巫师', '暴风雨', '核心爆裂', '流星龙',
+                         '宝贝龙', '磁力戒指', '补给部队', '扰乱怪衍生物', '契约履行'}
+
+    def search_archived_data(name_cn: str, desc_cn: str) -> CardRawDataItem | None:
         for item in archived_Data:
             if item["name"]["zh-cn"] == name_cn:
-                return item
+                if name_cn not in special_card_name:
+                    return item
+                if item["desc"]["zh-cn"] == desc_cn:  # 某些特殊卡片要二次校验
+                    return item
         return None
 
     iterable = (
@@ -115,14 +147,17 @@ def card_translate(
     )
 
     for i, item in iterable:
-        # name_jp = item["name"]["ja-jp"]
+        item_index = item["indx"]
         name_md = item["name"]["zh-cn"]
+        desc_md = item["desc"]["zh-cn"]
+
         progress_update_cb(f"{i}/{len(card_raw_data)}")
-        if result_archived := search_archived_data(name_md):
+        if result_archived := search_archived_data(name_md, desc_md):
             # 在已归档数据中找到了对应的日文名
             item["name"]["custom"] = result_archived["name"]["custom"]
             item["desc"]["custom"] = unity(result_archived["desc"]["custom"])
             continue
+
         if result_api_local := api_local(name_md):
             # print('API Local Found:', name_md)
 
@@ -130,17 +165,19 @@ def card_translate(
             item["name"]["custom"] = result_api_local["name"]
             item["desc"]["custom"] = unity(result_api_local["desc"])
             continue
-        if result_api := api(name_md, network_error_cb, dev_mode):
+
+        if result_api := api(name_md, desc_md, network_error_cb, dev_mode):
             # print('API Remote Found:', name_md, result_api)
 
             # 在API中找到了对应的日文名
             item["name"]["custom"] = result_api["name"]
             item["desc"]["custom"] = unity(result_api["desc"])  # 修正灵摆...修正\r\n
             continue
+
         # 未找到对应的日文名
         if dev_mode:
             tqdm.write(f"WARN: Can't find {name_md}")
-            # print(f"WARN: Can't find {name_md}")
+
         item["name"]["custom"] = item["name"]["zh-cn"]
         item["desc"]["custom"] = item["desc"]["zh-cn"]
 
