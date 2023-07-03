@@ -1,8 +1,8 @@
 ---
 name: BUG
 about: 提交BUG反馈
-title: "[BUG]"
-labels: ''
+title: "[BUG] "
+labels: bug
 assignees: ''
 
 ---
