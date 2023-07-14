@@ -19,8 +19,8 @@ def main(page: ft.Page):
     page.title = "No.86 卡片翻译切换"
     # page.bgcolor = "#f0f0f0"
     page.window_resizable = False
-    page.window_height = 390
-    page.window_width = 350
+    page.window_height = 410
+    page.window_width = 360
     page.padding = 0
     page.theme = ft.Theme(font_family="Microsoft YaHei")
     page.window_title_bar_buttons_hidden = True
@@ -138,6 +138,7 @@ def main(page: ft.Page):
     use_custom_font: bool = True
     output_to_local: bool = False
     fix_missing_glyph: bool = True
+    search_card_obj: bool = False
 
     def on_click_c1(e: ft.FilePickerResultEvent):
         nonlocal use_custom_trans
@@ -154,20 +155,26 @@ def main(page: ft.Page):
     def on_click_c3(e: ft.FilePickerResultEvent):
         nonlocal fix_missing_glyph
         fix_missing_glyph = e.data == "true"
-        c3.label = "尝试修复缺字问题(Beta)" if fix_missing_glyph else "不进行缺字问题修复"
+        c3.label = "修复部分生僻字缺字问题" if fix_missing_glyph else "不进行缺字问题修复"
         c3.update()
     
     def on_click_c4(e: ft.FilePickerResultEvent):
         nonlocal output_to_local
         output_to_local = e.data == "true"
-        c3.label = "输出到本地目录，便于手动覆盖" if output_to_local else "不输出到本地目录"
-        c3.update()
+        c4.label = "输出到本地目录，便于手动覆盖" if output_to_local else "不输出到本地目录"
+        c4.update()
+
+    def on_click_c5(e: ft.FilePickerResultEvent):
+        nonlocal search_card_obj
+        search_card_obj = e.data == "true"
+        c5.label = "扫描游戏目录以查找翻译文件(开发者调试用)"
+        c5.update()
 
     c1 = ft.Checkbox(label="使用汉化组卡片翻译", value=True, on_change=on_click_c1)
     c2 = ft.Checkbox(label="使用隶书卡片字体", value=True, on_change=on_click_c2)
-    c3 = ft.Checkbox(label="尝试修复缺字问题(Beta)", value=True, on_change=on_click_c3)
+    c3 = ft.Checkbox(label="修复部分生僻字缺字问题", value=True, on_change=on_click_c3)
     c4 = ft.Checkbox(label="不输出到本地目录", value=False, on_change=on_click_c4)
-
+    c5 = ft.Checkbox(label="扫描游戏目录以查找翻译文件(开发者调试用)", value=False, on_change=on_click_c5)
 
     """
     安装翻译
@@ -195,6 +202,7 @@ def main(page: ft.Page):
             custom_font=use_custom_font,
             output_to_local=output_to_local,
             fix_missing_glyph=fix_missing_glyph,
+            search_card_obj=search_card_obj,
             dev_mode=False,
         )
         is_installing = False
@@ -266,7 +274,7 @@ def main(page: ft.Page):
                         ],
                         scale=ft.Scale(0.95, alignment=ft.alignment.top_left)
                     ),
-                    ft.Column([c1, c2, c3, c4], spacing=0, scale=ft.Scale(0.85, alignment=ft.alignment.top_left)),
+                    ft.Column([c1, c2, c3, c4, c5], spacing=0, scale=ft.Scale(0.85, alignment=ft.alignment.top_left)),
                 ],
                 alignment=ft.MainAxisAlignment.CENTER,
             ),

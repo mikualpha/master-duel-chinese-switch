@@ -14,7 +14,7 @@ CardRawDataName = TypedDict(
 CardRawDataDesc = TypedDict("CardRawDataName", {"zh-cn": str, "custom": str})
 
 CardRawDataItem = TypedDict(
-    "CardRawDataItem", {"indx": int, "name": CardRawDataName, "desc": CardRawDataDesc}
+    "CardRawDataItem", {"cid": int, "name": CardRawDataName, "desc": CardRawDataDesc}
 )
 
 CardRawData = list[CardRawDataItem]
@@ -31,6 +31,7 @@ class CardEncryptedData(TypedDict):
 
 
 class Status:
+    searching_file = "扫描文件中(需较长时间)..."
     obtaining: str = "提取中"
     unpacking: str = "解包中"
     cracking: str = "轮询密钥中"

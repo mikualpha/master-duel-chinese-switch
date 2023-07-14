@@ -15,6 +15,12 @@ from utils import make_dir, get_resource_path
 from search import search_card_obj_list
 
 
+# PATH: b0ea6a33a5e8917c
+file_list = {  # Generate from search.py
+    'CN': {'CARD_Prop': '616eadbb', 'CARD_Name': '90231657', 'Card_Pidx': 'ad55ee2f', 'CARD_Indx': 'b46cbe43', 'Card_Part': 'b668466b', 'CARD_Desc': 'c5b5c405'}
+}
+
+
 def main(
     path_game_root: str,
     set_status: Callable[[str], None] = lambda _: print(_),
@@ -25,24 +31,13 @@ def main(
     custom_font: bool = False,
     output_to_local: bool = False,
     fix_missing_glyph: bool = False,
-    dev_mode: bool = False,
     search_card_obj: bool = False,
+    dev_mode: bool = False,
 ):
-    # PATH: 13e52c576428a1ef
-    file_list = {  # Generate from search.py
-        'CN': {
-            'CARD_Desc': '1708dd20',
-            'CARD_Indx': '66d1a766',
-            'CARD_Name': '429e0f72',
-            'CARD_Part': '64d55f4e',
-            'Card_Pidx': '7fe8f70a',
-        }
-    }
-
     try:
         if search_card_obj:  # 是否需要搜索文件
-            set_status_msg("扫描文件中(需较长时间)...")
-            file_list['CN'] = search_card_obj_list(path_game_root)
+            set_status(Status.searching_file)
+            file_list['CN'] = search_card_obj_list(path_game_root, log)
 
         make_dir(get_resource_path("output"))
         set_status_msg("安装中...")
