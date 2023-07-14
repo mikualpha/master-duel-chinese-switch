@@ -29,8 +29,8 @@ def card_pack(card_encrypt_data: CardEncryptedData, dir_input: str, dir_output: 
             if obj.type.name == "TextAsset":
                 data: Any = obj.read()
                 name: str = data.name.upper()
-                # if name in ["CARD_PIDX"]:
-                #     continue
+                if name in ["CARD_PROP"]:  # 不需要保存ID文件(没有修改)
+                    continue
                 data.script = card_encrypt_data[name.replace('RUBY', '')]
                 data.save()
 
