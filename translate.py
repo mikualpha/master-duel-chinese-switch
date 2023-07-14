@@ -147,26 +147,28 @@ def card_translate(
     )
 
     for i, item in iterable:
-        item_index = item["indx"]
+        cid = item["cid"]
         name_md = item["name"]["zh-cn"]
         desc_md = item["desc"]["zh-cn"]
 
         progress_update_cb(f"{i}/{len(card_raw_data)}")
+        # 新翻译文件(使用CID查找)
+        if result_api_local := api_local(cid):
+            # print('API Local Found:', name_md)
+
+            # 在本地缓存中找到对应的日文名
+            item["name"]["custom"] = result_api_local["name"]
+            item["desc"]["custom"] = unity(result_api_local["desc"])
+            continue
+
+        # 旧版翻译文件
         if result_archived := search_archived_data(name_md, desc_md):
             # 在已归档数据中找到了对应的日文名
             item["name"]["custom"] = result_archived["name"]["custom"]
             item["desc"]["custom"] = unity(result_archived["desc"]["custom"])
             continue
 
-        if result_api_local := api_local(name_md):
-            # print('API Local Found:', name_md)
-
-            # 在本地API中找到了对应的日文名
-            item["name"]["custom"] = result_api_local["name"]
-            item["desc"]["custom"] = unity(result_api_local["desc"])
-            continue
-
-        if result_api := api(name_md, desc_md, network_error_cb, dev_mode):
+        if result_api := api(name_md, cid, desc_md, network_error_cb, dev_mode):
             # print('API Remote Found:', name_md, result_api)
 
             # 在API中找到了对应的日文名

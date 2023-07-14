@@ -22,9 +22,8 @@ NameDesc = TypedDict("Card", {"name": str, "desc": str})
 
 
 class CardsCache(TypedDict):
-    name: dict[Literal["jp_name", "cn_name", "en_name", "jp_ruby",
-                       "nw_name", "sc_name", "md_name", "cnocg_n", "nwbbs_n"], str]
-    desc: dict[Literal["custom"], str]
+    name: dict[Literal["jp_name", "cn_name", "md_name"], str]
+    desc: dict[Literal["zh-cn", "custom"], str]
 
 
 class CacheManager(object):
@@ -32,21 +31,13 @@ class CacheManager(object):
     cardCache: dict[str, CardsCache] = {}
 
     @classmethod
-    def add_cache(cls, card_id: int, jp_name: str = '', cn_name: str = '', en_name: str = '', jp_ruby: str = '',
-                  nw_name: str = '', sc_name: str = '', md_name: str = '', cnocg_n: str = '', nwbbs_n: str = '',
-                  original_desc: str = '', custom_desc: str = ''):
+    def add_cache(cls, cid: int, jp_name: str = '', cn_name: str = '',
+                  md_name: str = '', original_desc: str = '', custom_desc: str = ''):
         cache_obj = {
-            "id": card_id,
             "name": {
-                    "jp_name": jp_name,
-                    "cn_name": cn_name,
-                    "en_name": en_name,
-                    "jp_ruby": jp_ruby,
-                    "nw_name": nw_name,
-                    "sc_name": sc_name,
-                    "md_name": md_name,
-                    "cnocg_n": cnocg_n,
-                    "nwbbs_n": nwbbs_n
+                "jp_name": jp_name,
+                "cn_name": cn_name,
+                "md_name": md_name
             },
             "desc": {
                 "zh-cn": original_desc,
@@ -54,9 +45,8 @@ class CacheManager(object):
             }
         }
 
-        name_hash = hashlib.sha1(md_name.strip().encode('utf-8')).hexdigest()
-        cls.cardCache[name_hash] = cache_obj
-        # print('Add Cache:', md_name, name_hash, len(cls.cardCache))
+        cls.cardCache[str(cid)] = cache_obj
+        print('Add Cache:', cid, md_name, cn_name, len(cls.cardCache))
         cls.save_cache()
 
     @classmethod
@@ -83,13 +73,12 @@ class CacheManager(object):
         return cls.cardCache
 
 
-def api_local(search: str) -> Union[NameDesc, None]:
+def api_local(cid: int) -> Union[NameDesc, None]:
     cards: dict[str, CardsCache] = CacheManager.load_cache()
 
-    def helper(search: str) -> Union[NameDesc, None]:
-        search_hash = hashlib.sha1(search.encode('utf-8')).hexdigest()
-        if search_hash in cards:
-            x: CardsCache = cards.get(search_hash, None)
+    def helper(card_id: int) -> Union[NameDesc, None]:
+        if str(card_id) in cards:
+            x: CardsCache = cards.get(str(card_id), None)
             if x is None:
                 return None
 
@@ -99,18 +88,16 @@ def api_local(search: str) -> Union[NameDesc, None]:
             }
         else:
             return None
+
     try:
-        search = search.replace(' ', ' ')  # 处理NBSP空格问题
-        # if q2b_res := helper(q2b_string(search)):
-        #     return q2b_res
-        return helper(search.strip())
+        return helper(cid)
     except Exception as e:
         # raise e
         return None
 
 
 def api(
-    search: str, desc_src: str, network_error_cb: Callable[[], None] = lambda: None, dev_mode: bool = False,
+    search: str, cid: int, desc_src: str, network_error_cb: Callable[[], None] = lambda: None, dev_mode: bool = False,
 ) -> Union[NameDesc, None, NoReturn]:
     if not dev_mode and search.endswith("衍生物"):
         return None  # YGOCDB不收录衍生物
@@ -135,16 +122,10 @@ def api(
             desc = f"{desc}\n【灵摆效果】\n{p_desc}"
 
         if dev_mode:
-            CacheManager.add_cache(item.get("id", -1),
+            CacheManager.add_cache(cid,
                                    jp_name=item.get('jp_name', ''),
                                    cn_name=item.get('cn_name', ''),
-                                   en_name=item.get('en_name', ''),
-                                   jp_ruby=item.get('jp_ruby', ''),
-                                   nw_name=item.get('nw_name', ''),
-                                   sc_name=item.get('sc_name', ''),
                                    md_name=item.get('md_name', ''),
-                                   cnocg_n=item.get('cnocg_n', ''),
-                                   nwbbs_n=item.get('nwbbs_n', ''),
                                    original_desc=desc_src,
                                    custom_desc=desc)
         return {"name": name, "desc": desc}

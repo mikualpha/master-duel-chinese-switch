@@ -1,4 +1,22 @@
 from hint import CardData, CardRawData, CardRawDataItem
+import struct
+
+
+def cidProcess(b: bytes, skip_num: int):
+    start_pos = skip_num * 8
+    cid_list = []
+    while True:
+        if start_pos + 2 >= len(b):
+            break
+        data = b[start_pos:start_pos + 2]
+        if not data:
+            break
+        value = struct.unpack("<H", data)[0]
+        cid_list.append(value)
+        # print(value)
+
+        start_pos += 8
+    return cid_list
 
 
 # Name Desc 的 start 分别是 0 4
@@ -54,10 +72,12 @@ def card_process(card_data: CardData) -> CardRawData:
     CARD_Desc_zh = progressiveProcess(
         card_data["zh-cn"]["CARD_DESC"], card_data["zh-cn"]["CARD_INDX"], 4
     )
+    CARD_CID_zh = cidProcess(card_data["zh-cn"]["CARD_PROP"], 1)
+
     res: CardRawData = []
     for i in range(len(CARD_Name_zh)):
         tmp: CardRawDataItem = {
-            "indx": i,
+            "cid": CARD_CID_zh[i],
             "name": {
                 # "ja-jp": CARD_Name_jp[i],
                 "ja-jp": "",
