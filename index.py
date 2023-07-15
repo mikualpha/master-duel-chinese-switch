@@ -90,7 +90,7 @@ def main(
 
         set_status(Status.packing)
         card_pack(
-            card_encrypt_data, get_resource_path("src"), get_resource_path("output")
+            card_encrypt_data, get_resource_path("src"), get_resource_path("output"), file_list['CN']
         )
 
         # 复制回去
