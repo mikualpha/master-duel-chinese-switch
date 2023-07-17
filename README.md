@@ -10,9 +10,9 @@
   
 </div>
 
-因自2023年5月初版本起，MD修改了缓存文件的存储和调用方式，原有的翻译补丁失效，所以在原项目的基础上进行了修改。
+自2023年5月初版本起，MD修改了缓存文件的调用方式，原有的翻译补丁失效，故在原项目的基础上进行了修改。
 
-本项目是在作者 [@叶lf](https://space.bilibili.com/23834819) / [@Timelic](https://space.bilibili.com/8664322) 工作的基础上进行的，在此表示感谢！另外感谢 [@拓王神](https://space.bilibili.com/483116312) 对数据文件解析部分提供的支持。
+本项目是在作者 [@叶lf](https://space.bilibili.com/23834819) / [@Timelic](https://space.bilibili.com/8664322) 工作的基础上进行的，在此表示感谢！另感谢 [@拓王神](https://space.bilibili.com/483116312) 对数据解析部分提供的支持。
 
 ## 使用方式
 前往[Releases页面](https://github.com/mikualpha/master-duel-chinese-switch/releases)下载`MDTR_vx.x.x.exe`，同时参考本项目README和原项目发布页使用。
@@ -84,6 +84,8 @@ PowerShell:
 
 ## 题外话
 因为开发环境没有接`Gitee`(外加发`Releases`没有`GitHub`友好)，所以把库拉到`GitHub`来修改了……严格意义来说并不符合开源礼仪，还请原作者大大见谅Orz
+
+本项目基于`AGPL-3.0`开源，任何分发、转载、修改行为请务必遵守[该开源协议](https://www.chinasona.org/gnu/agpl-3.0-cn.html)。本项目的Release页面为项目唯一发布源，不存在任何官方群组、不存在社交平台官方账号同时发布的情形，不存在任何购买、捐赠、打赏等付费入口，谨防上当受骗。
 
 如果出现报错或闪退可提`issue`，**欢迎有兴趣的童鞋提PR~~~**
 
