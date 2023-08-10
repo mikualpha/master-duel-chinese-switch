@@ -167,14 +167,19 @@ def main(page: ft.Page):
     def on_click_c5(e: ft.FilePickerResultEvent):
         nonlocal search_card_obj
         search_card_obj = e.data == "true"
-        c5.label = "扫描游戏目录以查找翻译文件(开发者调试用)"
+        if search_card_obj:
+            c5.label = "本项请仅在有开发者指引的情况下勾选！！"
+            c5.fill_color = ft.colors.RED
+        else:
+            c5.label = "扫描游戏目录以查找文件(切勿随意勾选)"
+            c5.fill_color = None
         c5.update()
 
     c1 = ft.Checkbox(label="使用汉化组卡片翻译", value=True, on_change=on_click_c1)
     c2 = ft.Checkbox(label="使用隶书卡片字体", value=True, on_change=on_click_c2)
     c3 = ft.Checkbox(label="修复部分生僻字缺字问题", value=True, on_change=on_click_c3)
     c4 = ft.Checkbox(label="不输出到本地目录", value=False, on_change=on_click_c4)
-    c5 = ft.Checkbox(label="扫描游戏目录以查找翻译文件(开发者调试用)", value=False, on_change=on_click_c5)
+    c5 = ft.Checkbox(label="扫描游戏目录以查找文件(切勿随意勾选)", value=False, on_change=on_click_c5)
 
     """
     安装翻译

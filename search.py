@@ -13,6 +13,7 @@ def search_card_obj_list(path_game_root: str, log: Callable[[str], None]) -> dic
         'CARD_Prop',
     )
 
+    log("Debug scanning option has been enabled.")
     card_obj_list = {}
     for root, dirs, files in os.walk(os.path.join(path_game_root, 'LocalData')):
         for file in files:
