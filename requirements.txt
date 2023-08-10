@@ -4,7 +4,7 @@ appdirs==1.4.4
 attrs @ file:///opt/conda/conda-bld/attrs_1642510447205/work
 black==19.3b0
 Brotli==1.0.9
-certifi==2022.9.24
+certifi==2023.7.22
 charset-normalizer==3.0.1
 click==8.0.3
 colorama==0.4.6
