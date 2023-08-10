@@ -127,6 +127,8 @@ def copy_to_original(
     复制path_pack下的所有文件和文件夹到path_dst，若存在则覆盖
     """
     if output_to_local:  # 输出到本地文件夹
+        if dev_mode:  # 防止循环复制，拦截
+            return
         create_folder(path.join(".", "output"))
         dst_dir = path.join(".", "output")
     else:
