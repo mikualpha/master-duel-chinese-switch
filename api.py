@@ -98,7 +98,7 @@ def api_local(cid: int) -> Union[NameDesc, None]:
 def api(
     search: str, cid: int, desc_src: str, network_error_cb: Callable[[], None] = lambda: None, dev_mode: bool = False,
 ) -> Union[NameDesc, None, NoReturn]:
-    if not dev_mode and search.endswith("衍生物"):
+    if search.endswith("衍生物"):
         return None  # YGOCDB不收录衍生物
 
     # 全角转半角
