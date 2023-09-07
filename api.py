@@ -6,17 +6,6 @@ import requests
 
 from utils import get_resource_path, q2b_string
 
-
-def getShortestStrIndex(l: list[str]) -> int:
-    shortest = l[0]
-    index = 0
-    for i, s in enumerate(l):
-        if len(s) < len(shortest):
-            shortest = s
-            index = i
-    return index
-
-
 NameDesc = TypedDict("Card", {"name": str, "desc": str})
 
 
@@ -96,7 +85,8 @@ def api_local(cid: int) -> Union[NameDesc, None]:
 
 
 def api(
-    search: str, cid: int, desc_src: str, network_error_cb: Callable[[], None] = lambda: None, dev_mode: bool = False,
+        search: str, cid: int, desc_src: str, network_error_cb: Callable[[], None] = lambda: None,
+        dev_mode: bool = False,
 ) -> Union[NameDesc, None, NoReturn]:
     if search.endswith("衍生物"):
         return None  # YGOCDB不收录衍生物
@@ -105,16 +95,24 @@ def api(
     # search = q2b_string(search)
     search = search.replace(' ', ' ')  # 处理NBSP空格问题
 
-    def helper(search: str) -> Union[NameDesc, None, NoReturn]:
+    def helper(search_keyword: str) -> Union[NameDesc, None, NoReturn]:
         url = "https://ygocdb.com/api/v0/?search="
-        r = requests.get(url + search)
+        r = requests.get(url + search_keyword)
         if r.status_code != 200:
             raise ConnectionError()
         result = r.json()["result"]
         if len(result) == 0:
             return None  # 找不到 直接返回 None
-        i = getShortestStrIndex([x["cn_name"] for x in result])
-        item = result[i]
+
+        item = None
+        for card_item in result:
+            if card_item["cid"] == cid or card_item["md_name"] == search:
+                item = card_item
+                break
+
+        if not item:
+            return None
+
         name: str = item["cn_name"]
         desc: str = item["text"]["desc"]
         if (p_desc := item["text"]["pdesc"]) != "":
@@ -130,17 +128,13 @@ def api(
         return {"name": name, "desc": desc}
 
     try:
-        return helper(search)
+        result = helper(str(cid))
+        if not result:
+            result = helper(search)
+        return result
     except Exception as e:
-        # 出错重试
-        # raise e
         try:
             return helper(search)
         except:
             network_error_cb()
             return None
-
-
-if __name__ == "__main__":
-    print(api("命运－英雄 统治魔侠"))
-    # print(q2b_string("魔神儀の創造主－クリオルター"))

@@ -4,7 +4,7 @@ from typing import Callable
 from tqdm import tqdm
 from tqdm.contrib import tenumerate
 
-from api import api, api_local
+from api import api, api_local, CacheManager
 from hint import CardRawData, CardRawDataItem
 
 
@@ -132,13 +132,24 @@ def card_translate(
                          '宝贝龙', '磁力戒指', '补给部队', '扰乱怪衍生物', '契约履行'}
 
     def search_archived_data(name_cn: str, desc_cn: str) -> CardRawDataItem | None:
-        for item in archived_Data:
-            if item["name"]["zh-cn"] == name_cn:
+        result_obj = None
+        for data_obj in archived_Data:
+            if data_obj["name"]["zh-cn"] == name_cn:
                 if name_cn not in special_card_name:
-                    return item
-                if item["desc"]["zh-cn"] == desc_cn:  # 某些特殊卡片要二次校验
-                    return item
-        return None
+                    result_obj = data_obj
+                    break
+                if data_obj["desc"]["zh-cn"] == desc_cn:  # 某些特殊卡片要二次校验
+                    result_obj = data_obj
+                    break
+
+        if dev_mode and result_obj is not None:
+            CacheManager.add_cache(cid,
+                                   jp_name=result_obj.get('name', {}).get('ja-jp', ''),
+                                   cn_name=result_obj.get('name', {}).get('custom', ''),
+                                   md_name=result_obj.get('name', {}).get('zh-cn', ''),
+                                   original_desc=result_obj.get('desc', {}).get('zh-cn', ''),
+                                   custom_desc=result_obj.get('desc', {}).get('custom', ''))
+        return result_obj
 
     iterable = (
         tenumerate(card_raw_data)
@@ -154,18 +165,9 @@ def card_translate(
         progress_update_cb(f"{i}/{len(card_raw_data)}")
         # 新翻译文件(使用CID查找)
         if result_api_local := api_local(cid):
-            # print('API Local Found:', name_md)
-
             # 在本地缓存中找到对应的日文名
             item["name"]["custom"] = result_api_local["name"]
             item["desc"]["custom"] = unity(result_api_local["desc"])
-            continue
-
-        # 旧版翻译文件
-        if result_archived := search_archived_data(name_md, desc_md):
-            # 在已归档数据中找到了对应的日文名
-            item["name"]["custom"] = result_archived["name"]["custom"]
-            item["desc"]["custom"] = unity(result_archived["desc"]["custom"])
             continue
 
         if result_api := api(name_md, cid, desc_md, network_error_cb, dev_mode):
@@ -174,6 +176,15 @@ def card_translate(
             # 在API中找到了对应的日文名
             item["name"]["custom"] = result_api["name"]
             item["desc"]["custom"] = unity(result_api["desc"])  # 修正灵摆...修正\r\n
+            continue
+
+        # 旧版翻译文件
+        if result_archived := search_archived_data(name_md, desc_md):
+            # print('Local JSON Found:', name_md)
+            
+            # 在已归档数据中找到了对应的日文名
+            item["name"]["custom"] = result_archived["name"]["custom"]
+            item["desc"]["custom"] = unity(result_archived["desc"]["custom"])
             continue
 
         # 未找到对应的日文名
