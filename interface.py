@@ -1,3 +1,4 @@
+import time
 from ctypes import alignment
 import webbrowser
 from os import path
@@ -9,6 +10,7 @@ from index import main as install_trans
 from utils import get_logger, throttle
 
 RELEASE_URL = "https://github.com/mikualpha/master-duel-chinese-switch"
+
 
 def log(e: Any) -> None:
     get_logger().error(e, stack_info=True)
@@ -55,16 +57,24 @@ def main(page: ft.Page):
     dialog
     """
 
-    def showDialog(content: str):
+    def showDialog(content: str | ft.Text, title_text: str = None, button_text: str = "好的"):
         def close_dlg(_):
             dlg.open = False
             page.update()
 
-        dlg = ft.AlertDialog(
-            content=ft.Text(content),
-            actions=[ft.TextButton("好的", on_click=close_dlg)],
-            actions_alignment=ft.MainAxisAlignment.END,
-        )
+        if title_text:
+            dlg = ft.AlertDialog(
+                title=ft.Text(title_text),
+                content=ft.Text(content) if type(content) is str else content,
+                actions=[ft.TextButton(button_text, on_click=close_dlg)],
+                actions_alignment=ft.MainAxisAlignment.END,
+            )
+        else:
+            dlg = ft.AlertDialog(
+                content=ft.Text(content) if type(content) is str else content,
+                actions=[ft.TextButton(button_text, on_click=close_dlg)],
+                actions_alignment=ft.MainAxisAlignment.END,
+            )
         page.dialog = dlg
         dlg.open = True
         page.update()
@@ -87,16 +97,16 @@ def main(page: ft.Page):
     btn_style = ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10))
 
     path_game_root: str = ""
-    
+
     btn_select_game_root = ft.Ref[ft.ElevatedButton]()
 
     def set_path_game_root(p: str) -> None:
         nonlocal path_game_root
         path_game_root = p
         page.client_storage.set("path_game_root", p)
-        if btn_select_game_root.current: # 按钮图标变化
+        if btn_select_game_root.current:  # 按钮图标变化
             btn_select_game_root.current.icon = ft.icons.CHECK
-    
+
     if p := page.client_storage.get("path_game_root"):
         set_path_game_root(p)
 
@@ -157,7 +167,7 @@ def main(page: ft.Page):
         fix_missing_glyph = e.data == "true"
         c3.label = "修复部分生僻字缺字问题" if fix_missing_glyph else "不进行缺字问题修复"
         c3.update()
-    
+
     def on_click_c4(e: ft.FilePickerResultEvent):
         nonlocal output_to_local
         output_to_local = e.data == "true"
@@ -215,12 +225,12 @@ def main(page: ft.Page):
     def status_update_cb(status: str):
         status_text.current.value = status
         status_text.current.update()
-    
+
     def status_update_msg_cb(msg: str):
         status_text_msg.current.message = msg
         status_text_msg.current.visible = bool(msg)
         status_text_msg.current.update()
-    
+
     @throttle(2)
     def network_error_cb():
         page.snack_bar = ft.SnackBar(ft.Text(f"网络错误，部分卡片将采用官方简中翻译。"))
@@ -272,7 +282,7 @@ def main(page: ft.Page):
                                             opacity=0.65,
                                             visible=False,
                                         )
-                                    ), 
+                                    ),
                                 ],
                                 spacing=15,
                             ),
@@ -286,6 +296,26 @@ def main(page: ft.Page):
             padding=ft.padding.symmetric(-15, 50),
         )
     )
+
+    if not page.client_storage.get("copyright_notice"):
+        time.sleep(0.5)
+        showDialog(ft.Text(
+            disabled=False,
+            # size=15,
+            spans=[
+                ft.TextSpan("    "),
+                ft.TextSpan("本项目为开源项目，只会通过"),
+                ft.TextSpan(
+                    "GitHub页面",
+                    ft.TextStyle(decoration=ft.TextDecoration.UNDERLINE,
+                                 decoration_color=ft.colors.BLUE,
+                                 color=ft.colors.BLUE),
+                    url=RELEASE_URL,
+                ),
+                ft.TextSpan("发布版本更新，不存在任何官方群，不会通过其它任何渠道发布，不存在任何购买、捐赠、打赏等付费入口，谨防木马病毒感染或上当受骗！"),
+            ],
+        ), title_text="声明", button_text="明白")
+        page.client_storage.set("copyright_notice", 1)
 
 
 ft.app(target=main)
