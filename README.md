@@ -17,8 +17,6 @@
 ## 使用方式
 前往[Releases页面](https://github.com/mikualpha/master-duel-chinese-switch/releases)下载`MDTR_vx.x.x.exe`，同时参考本项目README和原项目发布页使用。
 
-（因为`MDTR_vx.x.x.exe`已能正常使用，短期内不制作离线补丁包`OfflinePatch.zip`了）
-
 ### 注意事项
 1. 因为文件结构发生了变化，使用本地替换的话请把`output`下的所有文件夹替换至游戏目录`LocalData`文件夹下（在粘贴时应当有覆盖提示）；
 
@@ -62,14 +60,14 @@ A: 可能官方在更新后残留了部分旧文件，也有可能在之前版�
 若以上FAQ无法解决问题可尽管提`issue`，但希望在向开发者反馈时（无论是任何开发者的任何项目）能提供尽可能丰富的信息以帮助复现和解决问题。
 
 ## 关于项目
-本项目基于`AGPL-3.0`开源，任何分发、转载、修改行为请务必遵守[该开源协议](https://www.chinasona.org/gnu/agpl-3.0-cn.html)。本项目的Release页面为项目唯一发布源，不存在任何官方群组，不存在社交平台账号同时发布的情形，不存在任何诸如购买、捐赠、打赏等付费入口，谨防木马病毒感染或上当受骗。
+本项目基于`AGPL-3.0`协议开源，任何分发、转载、修改行为请务必遵守[开源协议](https://www.chinasona.org/gnu/agpl-3.0-cn.html)。本项目的Release页面为项目唯一发布源，不存在任何官方群组，不存在社交平台账号同时发布的情形，不存在任何诸如购买、捐赠、打赏等付费入口，谨防木马病毒感染或上当受骗。
 
 如果出现报错或闪退可提`issue`，**欢迎有兴趣的童鞋提PR~~~**
 
 **若认为此项目对您有帮助可考虑给项目点个`Star`，谢谢~**
 
 ## 开发相关
-本项目使用 `UnityPy` 解包，使用 `flet` 制作界面。
+本项目使用 `UnityPy` 解包，使用 `flet` 制作界面。编译环境为`Python 3.10`。
 
 ![](./images/display.jpg)
 #### 准备
@@ -83,7 +81,7 @@ pip install -r requirements.txt
 无界面
 
 ```
-python index.py
+python3 index.py
 ```
 
 flet 界面
