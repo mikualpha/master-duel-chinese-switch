@@ -16,11 +16,16 @@ class CardsCache(TypedDict):
 
 class CacheManager(object):
     CACHE_FILE_NAME = 'card_api_cache.json'
+    ABNORMAL_CARD_IDS = [30001, 30002]  # 翻译明显有问题的卡片，不加进缓存先
     cardCache: dict[str, CardsCache] = {}
 
     @classmethod
     def add_cache(cls, cid: int, jp_name: str = '', cn_name: str = '',
                   md_name: str = '', original_desc: str = '', custom_desc: str = ''):
+        if cid in cls.ABNORMAL_CARD_IDS:
+            print('Abnormal card, skip save:', cid, cn_name, md_name)
+            return
+
         cache_obj = {
             "name": {
                 "jp_name": jp_name,
@@ -88,6 +93,9 @@ def api(
         search: str, cid: int, desc_src: str, network_error_cb: Callable[[], None] = lambda: None,
         dev_mode: bool = False,
 ) -> Union[NameDesc, None, NoReturn]:
+    if not search:  # 没卡名查什么- -
+        return None
+
     if search.endswith("衍生物"):
         return None  # YGOCDB不收录衍生物
 

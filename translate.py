@@ -189,7 +189,7 @@ def card_translate(
 
         # 未找到对应的日文名
         if dev_mode:
-            tqdm.write(f"WARN: Can't find {name_md}")
+            tqdm.write(f"WARN: Can't find {name_md}({cid})")
 
         item["name"]["custom"] = item["name"]["zh-cn"]
         item["desc"]["custom"] = item["desc"]["zh-cn"]
