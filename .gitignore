@@ -2,6 +2,7 @@ src/**
 output/**
 dist
 build
+local_data
 
 data.unity3d
 

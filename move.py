@@ -150,8 +150,9 @@ def copy_to_original(
                     custom_font=custom_font, dev_mode=dev_mode)
 
         # 修复字体
-        output_font(path_game_root, data_key, dst_dir, dir_font, list(fix_fonts),
-                    custom_font=fix_missing_glyph, dev_mode=dev_mode)
+        # 因官方已添加字形，暂时禁用此功能
+        # output_font(path_game_root, data_key, dst_dir, dir_font, list(fix_fonts),
+        #             custom_font=fix_missing_glyph, dev_mode=dev_mode)
 
 
 FONT_CARD_FILE_NAME_CN = "f36fce47"     # FZBWKSJW

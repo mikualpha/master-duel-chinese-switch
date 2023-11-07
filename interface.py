@@ -147,7 +147,7 @@ def main(page: ft.Page):
     use_custom_trans: bool = True
     use_custom_font: bool = True
     output_to_local: bool = False
-    fix_missing_glyph: bool = True
+    fix_missing_glyph: bool = False
     search_card_obj: bool = False
 
     def on_click_c1(e: ft.FilePickerResultEvent):
@@ -187,7 +187,7 @@ def main(page: ft.Page):
 
     c1 = ft.Checkbox(label="使用汉化组卡片翻译", value=True, on_change=on_click_c1)
     c2 = ft.Checkbox(label="使用隶书卡片字体", value=True, on_change=on_click_c2)
-    c3 = ft.Checkbox(label="修复部分生僻字缺字问题", value=True, on_change=on_click_c3)
+    c3 = ft.Checkbox(label="修复部分生僻字缺字问题(已无需修复)", value=False, on_change=on_click_c3, disabled=True)
     c4 = ft.Checkbox(label="不输出到本地目录", value=False, on_change=on_click_c4)
     c5 = ft.Checkbox(label="扫描游戏目录以查找文件(切勿随意勾选)", value=False, on_change=on_click_c5)
 
