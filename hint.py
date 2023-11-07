@@ -1,6 +1,6 @@
 from typing import TypedDict, Literal
 
-FileName = Literal["CARD_INDX", "CARD_NAME", "CARD_DESC", "CARD_PART", "CARD_PIDX"]
+FileName = Literal["CARD_INDX", "CARD_NAME", "CARD_DESC", "CARD_PART", "CARD_PIDX", "CARD_PROP"]
 
 
 CardData = TypedDict(

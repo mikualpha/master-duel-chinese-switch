@@ -16,14 +16,14 @@ class CardsCache(TypedDict):
 
 class CacheManager(object):
     CACHE_FILE_NAME = 'card_api_cache.json'
-    ABNORMAL_CARD_IDS = [30001, 30002]  # 翻译明显有问题的卡片，不加进缓存先
+    ABNORMAL_CARD_START_ID = 30000  # 似乎是临时卡片，不加进缓存先
     cardCache: dict[str, CardsCache] = {}
 
     @classmethod
     def add_cache(cls, cid: int, jp_name: str = '', cn_name: str = '',
                   md_name: str = '', original_desc: str = '', custom_desc: str = ''):
-        if cid in cls.ABNORMAL_CARD_IDS:
-            print('Abnormal card, skip save:', cid, cn_name, md_name)
+        if cid >= cls.ABNORMAL_CARD_START_ID:
+            print('Temporary card, skip save:', cid, md_name, cn_name)
             return
 
         cache_obj = {

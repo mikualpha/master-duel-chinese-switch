@@ -15,9 +15,9 @@ from utils import make_dir, get_resource_path
 from search import search_card_obj_list
 
 
-# PATH: b0ea6a33a5e8917c
+# PATH: 53bcbb7060dfa23c
 file_list = {  # Generate from search.py
-    'CN': {'CARD_Prop': '616eadbb', 'CARD_Name': '90231657', 'Card_Pidx': 'ad55ee2f', 'CARD_Indx': 'b46cbe43', 'Card_Part': 'b668466b', 'CARD_Desc': 'c5b5c405'}
+    'CN': {'CARD_Prop': '65a16531', 'CARD_Name': '94ecdedd', 'Card_Pidx': 'a99a26a5', 'CARD_Indx': 'b0a376c9', 'Card_Part': 'b2a78ee1', 'CARD_Desc': 'c17a0c8f'}
 }
 
 
@@ -59,7 +59,10 @@ def main(
 
         set_status(Status.decrypting)
         card_data = card_decrypt(card_data, m_iCryptoKey)
-        # print('CardData:', card_data)
+
+        # for filename, data in card_data['zh-cn'].items():
+        #     with open('./resources/' + filename + '.bin', 'wb') as f:
+        #         f.write(data)
 
         set_status(Status.processing)
         card_raw_data = card_process(card_data)
