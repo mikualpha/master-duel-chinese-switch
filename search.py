@@ -36,6 +36,7 @@ def search_card_obj_list(path_game_root: str, log: Callable[[str], None]) -> dic
                             if name not in card_obj_list:
                                 card_obj_list[name] = file
             except Exception as e:
+                log('Error: ' + str(e))
                 continue
 
             if len(card_obj_list) >= len(card_obj_name):
@@ -44,5 +45,5 @@ def search_card_obj_list(path_game_root: str, log: Callable[[str], None]) -> dic
         if len(card_obj_list) >= len(card_obj_name):
             break
 
-    print(repr(card_obj_list))
+    log(repr(card_obj_list))
     return card_obj_list
