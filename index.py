@@ -15,9 +15,9 @@ from utils import make_dir, get_resource_path
 from search import search_card_obj_list
 
 
-# PATH: 53bcbb7060dfa23c
+# PATH: a04980f81c0a51d5
 file_list = {  # Generate from search.py
-    'CN': {'CARD_Prop': '65a16531', 'CARD_Name': '94ecdedd', 'Card_Pidx': 'a99a26a5', 'CARD_Indx': 'b0a376c9', 'Card_Part': 'b2a78ee1', 'CARD_Desc': 'c17a0c8f'}
+    'CN': {'CARD_Prop': '5f538a2b', 'Card_Part': '885561fb', 'CARD_Indx': '8a5199d3', 'Card_Pidx': '9368c9bf', 'CARD_Name': 'ae1e31c7', 'CARD_Desc': 'fb88e395'}
 }
 
 
@@ -135,5 +135,5 @@ if __name__ == "__main__":
         custom_font=False,
         output_to_local=True,  # 是否仅输出到本地
         dev_mode=True,
-        search_card_obj=False,
+        search_card_obj=True,
     )
