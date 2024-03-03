@@ -135,5 +135,5 @@ if __name__ == "__main__":
         custom_font=False,
         output_to_local=True,  # 是否仅输出到本地
         dev_mode=True,
-        search_card_obj=True,
+        search_card_obj=False,
     )
