@@ -75,6 +75,14 @@ def api_local(cid: int) -> Union[NameDesc, None]:
             if x is None:
                 return None
 
+            # if dev_mode:  # 刷新一下游戏内翻译
+            #     CacheManager.add_cache(cid,
+            #                            jp_name=x['name']['jp_name'],
+            #                            cn_name=x['name']['cn_name'],
+            #                            md_name=name_md,
+            #                            original_desc=desc_md,
+            #                            custom_desc=x['desc']['custom'])
+
             return {
                 "name": x["name"]["cn_name"],
                 "desc": x["desc"]["custom"],
