@@ -1,3 +1,4 @@
+import json
 import os
 import UnityPy
 from typing import Callable
@@ -45,5 +46,5 @@ def search_card_obj_list(path_game_root: str, log: Callable[[str], None]) -> dic
         if len(card_obj_list) >= len(card_obj_name):
             break
 
-    log(repr(card_obj_list))
+    log(json.dumps(card_obj_list))
     return card_obj_list

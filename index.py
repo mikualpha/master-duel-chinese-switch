@@ -11,7 +11,7 @@ from pack import card_pack
 from process import card_process
 from translate import card_translate
 from unpack import card_unpack
-from utils import make_dir, get_resource_path
+from utils import make_dir, get_resource_path, get_path_json
 from search import search_card_obj_list
 
 
@@ -38,6 +38,15 @@ def main(
         if search_card_obj:  # 是否需要搜索文件
             set_status(Status.searching_file)
             file_list['CN'] = search_card_obj_list(path_game_root, log)
+        else:
+            for region in file_list.keys():
+                set_status(Status.get_path_info)
+                path_list = get_path_json('YGO_CARDPATH_' + region.upper() + '.json')
+                if path_list is None or len(path_list) <= 0:
+                    set_status(Status.error_network)
+                    return
+                file_list[region] = path_list
+                # print(json.dumps(path_list))
 
         make_dir(get_resource_path("output"))
         set_status_msg("安装中...")

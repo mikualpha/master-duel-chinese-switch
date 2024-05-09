@@ -1,8 +1,9 @@
 import logging
 import os
 import sys
+import requests
 from threading import Timer
-from typing import Callable, ParamSpec, TypeVar
+from typing import Callable, ParamSpec, TypeVar, Union, NoReturn
 
 
 def getFilesList(path: str) -> list[str]:
@@ -98,6 +99,34 @@ def get_logger() -> logging.Logger:
     logger.addHandler(stdout_handler)
 
     return logger
+
+
+GIST_URL = 'https://gist.githubusercontent.com/mikualpha/de53fb59b1c63a8be98539e04aba5d42/raw/'
+GIST_MIRROR_DOMAIN = 'https://mirror.ghproxy.com/'
+
+
+def get_path_json(filename) -> Union[dict[str, str], None]:
+    def helper(url: str) -> Union[dict[str, str], None, NoReturn]:
+        r = requests.get(url)
+        if r.status_code != 200:
+            raise ConnectionError()
+        json_obj = r.json()
+        if len(json_obj) == 0:
+            return None  # 找不到 直接返回 None
+
+        return json_obj
+
+    request_url = GIST_URL + filename
+    try:
+        result = helper(request_url)
+        if not result:
+            result = helper(GIST_MIRROR_DOMAIN + request_url)
+        return result
+    except Exception as e:
+        try:
+            return helper(GIST_MIRROR_DOMAIN + request_url)
+        except:
+            return None
 
 
 if __name__ == '__main__':

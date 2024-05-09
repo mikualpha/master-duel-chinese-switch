@@ -31,7 +31,8 @@ class CardEncryptedData(TypedDict):
 
 
 class Status:
-    searching_file = "扫描文件中(需较长时间)..."
+    get_path_info: str = "拉取元数据..."
+    searching_file: str = "扫描文件中(需较长时间)..."
     obtaining: str = "提取中"
     unpacking: str = "解包中"
     cracking: str = "轮询密钥中"
