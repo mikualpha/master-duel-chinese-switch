@@ -101,14 +101,28 @@ class SplitResult(TypedDict):
 
 
 def split(desc: str, n_part: int = -1) -> SplitResult:
-    starts = [m.start() for m in re.finditer("((①|②|③|④|⑤|⑥|⑦)(：))|(【灵摆效果】)", desc)]
+    starts = [m.start() for m in re.finditer("((①|②|③|④|⑤|⑥|⑦)(：))|(【灵摆效果】)|(●)", desc)] + [len(desc)]
     parts_int: list[list[int]] = []  # [[0, 101], [101, 200], [200, 300], ...]
+    options_int: list[list[int]] = []  # 带有●的列表，规范中要求后置
+
     for i in range(len(starts) - 1):
-        parts_int.append([starts[i], starts[i + 1]])
-    if len(parts_int) > 0:
-        parts_int.append([parts_int[-1][1], len(desc)])  # 加入最后一个
-    if len(starts) == 1:
-        parts_int.append([starts[0], len(desc)])  # 只搜到一个的情况
+        next_index = i + 1
+        if desc[starts[i]] != '●':  # 检查有无列表式选项
+            while next_index < len(starts) - 1 and desc[starts[next_index]] == '●':
+                next_index += 1  # 将文本涵盖这个选项
+
+        start_pos = starts[i]
+        end_pos = starts[next_index]
+        if desc[end_pos - 1] == '\n':  # 不包含换行符
+            end_pos -= 1
+
+        if desc[start_pos] == '●':
+            options_int.append([start_pos, end_pos])
+        else:
+            parts_int.append([start_pos, end_pos])
+
+    parts_int += options_int  # 加入后置元素
+
     parts_int = list(filter(lambda x: desc[x[0]] != "【", parts_int))  # 【灵摆效果】本质上是没用的
     parts: list[list[int]] = [
         [len(desc[:start].encode("UTF-8")), len(desc[:end].encode("UTF-8"))]
@@ -227,6 +241,8 @@ def gen_part(
         seg["parts_custom"] = split_result["parts"]
         seg["segments_custom"] = split_result["segments"]
 
+        # if item['name']['custom'] in ("增殖的G", '灰流丽', 'Y-龙头'):
+        #     print(seg)
         card_segs.append(seg)
 
     # 合成新的card_part_full即可: 先加上俩0，然后一变二
