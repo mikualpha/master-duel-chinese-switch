@@ -88,7 +88,7 @@ class CardsCache(TypedDict):
 
 class CacheManager(object):
     CACHE_FILE_NAME = 'card_api_cache.json'
-    ABNORMAL_CARD_START_ID = 30000  # 似乎是临时卡片，不加进缓存先
+    ABNORMAL_CARD_START_ID = 40000  # 似乎是临时卡片，不加进缓存先
     cardCache: dict[str, CardsCache] = {}
 
     @classmethod
