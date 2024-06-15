@@ -44,5 +44,5 @@ class Status:
     overriding: str = "覆写中"
     success: str = "成功"
     failed: str = "失败"
-    error_network: str = "网络错误"
+    error_network: str = "拉取数据失败"
     error_io: str = "无权限"
