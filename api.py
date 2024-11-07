@@ -98,6 +98,10 @@ class CacheManager(object):
             print('Temporary card, skip save:', cid, md_name, cn_name)
             return
 
+        if md_name == '':
+            print('no name card, skip save:', cid, cn_name)
+            return
+
         cache_obj = {
             "name": {
                 "jp_name": jp_name,
