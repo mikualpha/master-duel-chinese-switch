@@ -20,13 +20,13 @@ def main(page: ft.Page):
     # 设置页面基础信息
     page.title = "No.86 卡片翻译切换"
     # page.bgcolor = "#f0f0f0"
-    page.window_resizable = False
-    page.window_height = 410
-    page.window_width = 360
+    page.window.resizable = False
+    page.window.height = 410
+    page.window.width = 360
     page.padding = 0
     page.theme = ft.Theme(font_family="Microsoft YaHei")
-    page.window_title_bar_buttons_hidden = True
-    page.window_title_bar_hidden = True
+    page.window.title_bar_buttons_hidden = True
+    page.window.title_bar_hidden = True
     page.dark_theme = ft.Theme(font_family="Microsoft YaHei")
     page.theme_mode = ft.ThemeMode.DARK
     page.update()
@@ -47,7 +47,7 @@ def main(page: ft.Page):
                     ft.icons.CLOSE,
                     icon_color="gray",
                     icon_size=15,
-                    on_click=lambda _: page.window_destroy(),
+                    on_click=lambda _: page.window.close() and page.window.destroy(),
                 ),
             ]
         )
@@ -75,7 +75,7 @@ def main(page: ft.Page):
                 actions=[ft.TextButton(button_text, on_click=close_dlg)],
                 actions_alignment=ft.MainAxisAlignment.END,
             )
-        page.dialog = dlg
+        page.overlay.append(dlg)
         dlg.open = True
         page.update()
 
@@ -137,7 +137,7 @@ def main(page: ft.Page):
     )
 
     def open_dlg_modal(e):
-        page.dialog = dlg_modal
+        page.overlay.append(dlg_modal)
         dlg_modal.open = True
         page.update()
 
@@ -210,7 +210,6 @@ def main(page: ft.Page):
         install_trans(
             path_game_root,
             set_status=status_update_cb,
-            set_status_msg=status_update_msg_cb,
             network_error_cb=network_error_cb,
             log=log,
             custom_trans=use_custom_trans,
@@ -226,11 +225,6 @@ def main(page: ft.Page):
         status_text.current.value = status
         status_text.current.update()
 
-    def status_update_msg_cb(msg: str):
-        status_text_msg.current.message = msg
-        status_text_msg.current.visible = bool(msg)
-        status_text_msg.current.update()
-
     @throttle(2)
     def network_error_cb():
         page.snack_bar = ft.SnackBar(ft.Text(f"网络错误，部分卡片将采用官方简中翻译。"))
@@ -245,14 +239,14 @@ def main(page: ft.Page):
         ft.Container(
             ft.Column(
                 [
-                    ft.Tooltip(
-                        message="打开软件发布页",
-                        content=ft.IconButton(
-                            icon=ft.icons.JOIN_RIGHT_SHARP,
-                            # icon=ft.icons.AUTO_MODE,
-                            icon_size=50,
-                            icon_color=ft.colors.BLUE_400,
-                            on_click=lambda _: webbrowser.open(RELEASE_URL, 1),
+                    ft.IconButton(
+                        icon=ft.icons.JOIN_RIGHT_SHARP,
+                        # icon=ft.icons.AUTO_MODE,
+                        icon_size=50,
+                        icon_color=ft.colors.BLUE_400,
+                        on_click=lambda _: webbrowser.open(RELEASE_URL, 1),
+                        tooltip=ft.Tooltip(
+                            message="打开软件发布页",
                         ),
                     ),
                     ft.Column(
@@ -272,17 +266,14 @@ def main(page: ft.Page):
                                         style=btn_style,
                                         on_click=install,
                                     ),
-                                    ft.Tooltip(
-                                        message="安装中",
-                                        ref=status_text_msg,
-                                        content=ft.Text(
-                                            "安装中",
-                                            ref=status_text,
-                                            size=12,
-                                            opacity=0.65,
-                                            visible=False,
-                                        )
-                                    ),
+                                    ft.Text(
+                                        "安装中",
+                                        ref=status_text,
+                                        size=12,
+                                        opacity=0.65,
+                                        visible=False,
+                                    )
+
                                 ],
                                 spacing=15,
                             ),

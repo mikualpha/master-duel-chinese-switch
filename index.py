@@ -24,7 +24,6 @@ file_list = {  # Generate from search.py
 def main(
     path_game_root: str,
     set_status: Callable[[str], None] = lambda _: print(_),
-    set_status_msg: Callable[[str], None] = lambda _: print(_),
     log: Callable[[str], None] = lambda _: print(_),
     network_error_cb: Callable[[], None] = lambda: None,
     custom_trans: bool = True,
@@ -49,7 +48,6 @@ def main(
                 # print(json.dumps(path_list))
 
         make_dir(get_resource_path("output"))
-        set_status_msg("安装中...")
 
         # 首先 copy到本地
         set_status(Status.obtaining)
@@ -120,14 +118,12 @@ def main(
         )
 
         set_status(Status.success)
-        set_status_msg("翻译成功！")
 
     except IOError as e:
         # 这儿对应无权限
         print(e)
         log(str(e))
         set_status(Status.error_io)
-        set_status_msg('请以管理员身份运行本程序，\n或者勾选下面的"输出到本地目录"。')
 
     except Exception as e:
         # raise e

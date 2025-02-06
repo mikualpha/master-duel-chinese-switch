@@ -1,5 +1,5 @@
-flet>=0.10.1
+flet==0.24.1
 pyinstaller>=5.8.0
-Requests>=2.31.0
-tqdm>=4.64.1
+Requests>=2.32.0
+tqdm>=4.66.3
 UnityPy>=1.9.26
