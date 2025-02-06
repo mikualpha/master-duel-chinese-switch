@@ -107,7 +107,7 @@ GIST_MIRROR_DOMAIN = 'https://mirror.ghproxy.com/'
 
 def get_path_json(filename) -> Union[dict[str, str], None]:
     def helper(url: str) -> Union[dict[str, str], None, NoReturn]:
-        r = requests.get(url)
+        r = requests.get(url, timeout=5)
         if r.status_code != 200:
             raise ConnectionError()
         json_obj = r.json()

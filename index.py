@@ -44,8 +44,8 @@ def main(
                 path_list = get_path_json('YGO_CARDPATH_' + region.upper() + '.json')
                 if path_list is None or len(path_list) <= 0:
                     set_status(Status.error_network)
-                    return
-                file_list[region] = path_list
+                else:
+                    file_list[region] = path_list
                 # print(json.dumps(path_list))
 
         make_dir(get_resource_path("output"))
