@@ -102,7 +102,7 @@ def get_logger() -> logging.Logger:
 
 
 GIST_URL = 'https://gist.githubusercontent.com/mikualpha/de53fb59b1c63a8be98539e04aba5d42/raw/'
-GIST_MIRROR_DOMAIN = 'https://mirror.ghproxy.com/'
+GIST_MIRROR_DOMAIN = 'https://ghfast.top/'
 
 
 def get_path_json(filename) -> Union[dict[str, str], None]:
