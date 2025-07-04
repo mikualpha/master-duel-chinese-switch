@@ -77,7 +77,14 @@ class UnifyChar:
         return reduce(lambda x, y: f"{x}{y}", parts)
 
     @staticmethod
-    def unity(desc: str) -> str:
+    def unity_name(name: str) -> str:
+        # 码丽丝<兵卒>睡鼠 等卡片的长度在不同语言中会有异议，故在name字段统一改用全角
+        name = name.replace('<', '＜')
+        name = name.replace('>', '＞')
+        return name
+
+    @staticmethod
+    def unity_desc(desc: str) -> str:
         return UnifyChar.unify_separator(UnifyChar.unify_pendulum_desc(desc))
 
 
@@ -210,7 +217,8 @@ def api(
         if (p_desc := item["text"]["pdesc"]) != "":
             desc = f"{desc}\n【灵摆效果】\n{p_desc}"
 
-        desc = UnifyChar.unity(desc)  # 修正灵摆...修正\r\n
+        name = UnifyChar.unity_name(name)  # 修正名字显示不正确的各种问题
+        desc = UnifyChar.unity_desc(desc)  # 修正灵摆...修正\r\n
         if dev_mode:
             CacheManager.add_cache(cid,
                                    jp_name=item.get('jp_name', ''),
