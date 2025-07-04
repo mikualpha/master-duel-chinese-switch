@@ -1,0 +1,54 @@
+name: Flet Build
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Dependencies cache
+        uses: actions/cache@v4.2.3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Sanitize version name
+        shell: pwsh
+        run: |
+          $versionName = "${{ github.ref_name }}"
+          $versionStripped = $versionName -replace "^v", ""
+          echo "version=$versionStripped" >> $env:GITHUB_ENV
+
+      - name: Package with flet
+        run: |
+          flet pack ".\interface.py" `
+            --add-data "unity;UnityPy/resources" `
+            --add-data "resources;resources" `
+            --name "MDTR_v${{ env.version }}" `
+            --icon "images/icon.png" `
+            --file-version ${{ env.version }}
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/MDTR_v${{ env.version }}.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
