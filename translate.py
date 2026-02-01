@@ -40,7 +40,7 @@ class TranslateHelper:
 
     def _load_archived_data(self):
         if self.dev_mode:
-            with open(os.path.join("./unity/old_card_cache.json"), "r", encoding="utf8") as f:
+            with open(os.path.join("./resources_dev/old_card_cache.json"), "r", encoding="utf8") as f:
                 self.archived_data: CardRawData = json.load(f)
 
             self._progress_bar = tqdm.tqdm(total=len(self.card_raw_data), desc="Translating", disable=not self.dev_mode)
