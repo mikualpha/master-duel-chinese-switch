@@ -196,7 +196,7 @@ class CardApiRequest:
         self._lock = threading.Lock()
         self._session = None
 
-    def get_session(self):
+    def _get_session(self):
         if self._session is None:
             with self._lock:
                 if self._session is None:  # double-check
@@ -216,7 +216,7 @@ class CardApiRequest:
         # search = q2b_string(search)
         search = search.replace(' ', ' ')  # 处理NBSP空格问题
 
-        session = self.get_session()
+        session = self._get_session()
         def helper(search_keyword: str) -> Union[NameDesc, None, NoReturn]:
             url = "https://ygocdb.com/api/v0/?search="
             r = session.get(url + search_keyword)

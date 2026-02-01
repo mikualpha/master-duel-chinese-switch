@@ -60,7 +60,7 @@ class TranslateHelper:
             return False
         return True
 
-    def search_archived_data(self, cid: int, name_cn: str, desc_cn: str) -> CardRawDataItem | None:
+    def _search_archived_data(self, cid: int, name_cn: str, desc_cn: str) -> CardRawDataItem | None:
         result_obj = None
         for data_obj in self.archived_data:
             if data_obj["name"]["zh-cn"] == name_cn:
@@ -109,7 +109,7 @@ class TranslateHelper:
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
             futures = [
-                executor.submit(self.try_translate_single_card, item)
+                executor.submit(self._try_translate_single_card, item)
                 for _, item in iterable
             ]
 
@@ -122,7 +122,7 @@ class TranslateHelper:
 
         return self.card_raw_data
 
-    def try_translate_single_card(self, item: CardRawDataItem):
+    def _try_translate_single_card(self, item: CardRawDataItem):
         cid = item["cid"]
         name_md = item["name"]["zh-cn"]
         desc_md = item["desc"]["zh-cn"]
@@ -150,7 +150,7 @@ class TranslateHelper:
 
         # 旧版翻译文件
         if self.dev_mode and force_update_card_cache:
-            if result_archived := self.search_archived_data(cid, name_md, desc_md):
+            if result_archived := self._search_archived_data(cid, name_md, desc_md):
                 tqdm.tqdm.write(f'Local JSON Found: {name_md}')
 
                 # 在已归档数据中找到了对应的日文名
