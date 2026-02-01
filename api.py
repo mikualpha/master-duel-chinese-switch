@@ -77,16 +77,25 @@ class UnifyChar:
         # merge parts
         return reduce(lambda x, y: f"{x}{y}", parts)
 
+    _unify_name_dict = {
+        '<': '＜',  # 码丽丝<兵卒>睡鼠 等卡片的长度在不同语言中会有异议，故在name字段统一改用全角
+        '>': '＞',
+        '-': '－',
+        '=': '＝',
+        '·': '・',
+    }
+
     @staticmethod
-    def unity_name(name: str) -> str:
-        # 码丽丝<兵卒>睡鼠 等卡片的长度在不同语言中会有异议，故在name字段统一改用全角
-        name = name.replace('<', '＜')
-        name = name.replace('>', '＞')
+    def unify_name(name: str) -> str:
+        for src_char, dst_char in UnifyChar._unify_name_dict.items():
+            name = name.replace(src_char, dst_char)
         return name
 
     @staticmethod
-    def unity_desc(desc: str) -> str:
-        return UnifyChar.unify_separator(UnifyChar.unify_pendulum_desc(desc))
+    def unify_desc(desc: str) -> str:
+        desc = UnifyChar.unify_separator(UnifyChar.unify_pendulum_desc(desc))
+        desc = UnifyChar.unify_name(desc)
+        return desc
 
 
 class CardsCache(TypedDict):
@@ -179,7 +188,7 @@ def api_local(cid: int) -> Union[NameDesc, None]:
             #                            custom_desc=x['desc']['custom'])
 
             return {
-                "name": x["name"]["cn_name"],
+                "name": UnifyChar.unify_name(x["name"]["cn_name"]),
                 "desc": x["desc"]["custom"],
             }
         else:
@@ -240,8 +249,8 @@ class CardApiRequest:
             if (p_desc := item["text"]["pdesc"]) != "":
                 desc = f"{desc}\n【灵摆效果】\n{p_desc}"
 
-            name = UnifyChar.unity_name(name)  # 修正名字显示不正确的各种问题
-            desc = UnifyChar.unity_desc(desc)  # 修正灵摆...修正\r\n
+            name = UnifyChar.unify_name(name)  # 修正名字显示不正确的各种问题
+            desc = UnifyChar.unify_desc(desc)  # 修正灵摆...修正\r\n
             if dev_mode:
                 CacheManager.add_cache(cid,
                                        jp_name=item.get('jp_name', ''),
