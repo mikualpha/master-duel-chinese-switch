@@ -9,7 +9,7 @@ from hint import CardRawData, Status
 from move import copy_to_local, copy_to_original
 from pack import card_pack
 from process import card_process
-from translate import card_translate
+from translate import TranslateHelper
 from unpack import card_unpack
 from utils import make_dir, get_resource_path, get_path_json
 from search import search_card_obj_list
@@ -75,23 +75,17 @@ def main(
         card_raw_data = card_process(card_data)
         # print('CardRawData:', card_raw_data)
 
-        with open(
-            path.join(get_resource_path("resources"), "card.json"), "r", encoding="utf8"
-        ) as f:
-            archived_Data: CardRawData = json.load(f)
-
         if custom_trans:
             set_status(Status.translating)
             # 恢复则无需翻译
-            card_raw_data = card_translate(
-                archived_Data,
+            translate_helper = TranslateHelper(
                 card_raw_data,
-                progress_update_cb=(lambda _: None)
-                if dev_mode
-                else (lambda p: set_status(f"{Status.translating}: {p}")),
+                progress_update_cb=(lambda _: None) if dev_mode else (lambda p: set_status(f"{Status.translating}: {p}")),
                 network_error_cb=network_error_cb,
                 dev_mode=dev_mode,
             )
+
+            card_raw_data = translate_helper.card_translate()
 
         set_status(Status.encrypting)
         card_encrypt_data = card_encrypt(

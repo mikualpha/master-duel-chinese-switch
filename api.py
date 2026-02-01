@@ -1,6 +1,7 @@
 import json
+import threading
 from os import path
-from typing import Callable, Literal, NoReturn, TypedDict, Union
+from typing import Callable, Literal, NoReturn, TypedDict, Union, Dict
 from utils import get_resource_path, q2b_string
 from functools import reduce
 import requests
@@ -95,8 +96,10 @@ class CardsCache(TypedDict):
 
 class CacheManager(object):
     CACHE_FILE_NAME = 'card_api_cache.json'
-    ABNORMAL_CARD_START_ID = 40000  # 似乎是临时卡片，不加进缓存先
-    cardCache: dict[str, CardsCache] = {}
+    ABNORMAL_CARD_START_ID = 40000  # 临时卡片不加入缓存
+    cardCache: Dict[str, dict] = {}
+
+    _lock = threading.Lock()  # 全局锁，保护所有读写操作
 
     @classmethod
     def add_cache(cls, cid: int, jp_name: str = '', cn_name: str = '',
@@ -121,32 +124,41 @@ class CacheManager(object):
             }
         }
 
-        cls.cardCache[str(cid)] = cache_obj
-        print('Add Cache:', cid, md_name, '->', cn_name, len(cls.cardCache))
-        cls.save_cache()
+        with cls._lock:
+            cls.cardCache[str(cid)] = cache_obj
+            print('Add Cache:', cid, md_name, '->', cn_name, len(cls.cardCache))
+            cls._save_cache_locked()  # 内部调用必须在锁内
 
     @classmethod
-    def save_cache(cls):
-        with open(path.join(get_resource_path("resources"), cls.CACHE_FILE_NAME), "w", encoding="utf-8") as f:
+    def _save_cache_locked(cls):
+        """在锁内调用"""
+        file_path = path.join(get_resource_path("resources"), cls.CACHE_FILE_NAME)
+        with open(file_path, "w", encoding="utf-8") as f:
             f.write(json.dumps(cls.cardCache, ensure_ascii=False, separators=(',', ':')))
 
     @classmethod
-    def load_cache(cls) -> dict[str, CardsCache]:
-        if len(cls.cardCache) > 0:
-            # print('Load Cache: ', len(cls.cardCache))
+    def save_cache(cls):
+        with cls._lock:
+            cls._save_cache_locked()
+
+    @classmethod
+    def load_cache(cls) -> Dict[str, dict]:
+        with cls._lock:
+            if len(cls.cardCache) > 0:
+                return cls.cardCache
+
+            try:
+                file_path = path.join(get_resource_path("resources"), cls.CACHE_FILE_NAME)
+                with open(file_path, encoding="utf-8") as f:
+                    file_content = f.read().strip()
+                    if len(file_content) <= 0:
+                        return cls.cardCache
+
+                    cls.cardCache = json.loads(file_content)
+            except Exception:
+                cls.cardCache = {}
+
             return cls.cardCache
-
-        try:
-            with open(path.join(get_resource_path("resources"), cls.CACHE_FILE_NAME), encoding="utf-8") as f:
-                file_content = f.read().strip()
-                if len(file_content) <= 0:
-                    return cls.cardCache
-
-                cls.cardCache = json.loads(file_content)
-                # print('Load Success: ', len(cls.cardCache))
-        except Exception as e:
-            cls.cardCache = {}
-        return cls.cardCache
 
 
 def api_local(cid: int) -> Union[NameDesc, None]:
@@ -179,66 +191,77 @@ def api_local(cid: int) -> Union[NameDesc, None]:
         # raise e
         return None
 
+class CardApiRequest:
+    def __init__(self):
+        self._lock = threading.Lock()
+        self._session = None
 
-def api(
-        search: str, cid: int, desc_src: str, network_error_cb: Callable[[], None] = lambda: None,
-        dev_mode: bool = False,
-) -> Union[NameDesc, None, NoReturn]:
-    if not search:  # 没卡名查什么- -
-        return None
+    def get_session(self):
+        if self._session is None:
+            with self._lock:
+                if self._session is None:  # double-check
+                    self._session = requests.Session()
+        return self._session
 
-    if search.endswith("衍生物"):
-        return None  # YGOCDB不收录衍生物
-
-    # 全角转半角
-    # search = q2b_string(search)
-    search = search.replace(' ', ' ')  # 处理NBSP空格问题
-
-    def helper(search_keyword: str) -> Union[NameDesc, None, NoReturn]:
-        url = "https://ygocdb.com/api/v0/?search="
-        r = requests.get(url + search_keyword)
-        if r.status_code != 200:
-            raise ConnectionError()
-        result = r.json()["result"]
-        if len(result) == 0:
-            return None  # 找不到 直接返回 None
-
-        item = None
-        for card_item in result:
-            if card_item["cid"] == cid or card_item["md_name"] == search:
-                item = card_item
-                break
-
-        if not item:
+    def api(self, search: str, cid: int, desc_src: str, network_error_cb: Callable[[], None] = lambda: None,
+            dev_mode: bool = False,
+    ) -> Union[NameDesc, None, NoReturn]:
+        if not search:  # 没卡名查什么- -
             return None
 
-        name: str = item["cn_name"]
-        desc: str = item["text"]["desc"]
-        if (p_desc := item["text"]["pdesc"]) != "":
-            desc = f"{desc}\n【灵摆效果】\n{p_desc}"
+        if search.endswith("衍生物"):
+            return None  # YGOCDB不收录衍生物
 
-        name = UnifyChar.unity_name(name)  # 修正名字显示不正确的各种问题
-        desc = UnifyChar.unity_desc(desc)  # 修正灵摆...修正\r\n
-        if dev_mode:
-            CacheManager.add_cache(cid,
-                                   jp_name=item.get('jp_name', ''),
-                                   cn_name=item.get('cn_name', ''),
-                                   md_name=item.get('md_name', ''),
-                                   original_desc=desc_src,
-                                   custom_desc=desc)
-        return {"name": name, "desc": desc}
+        # 全角转半角
+        # search = q2b_string(search)
+        search = search.replace(' ', ' ')  # 处理NBSP空格问题
 
-    try:
-        result = helper(str(cid))
-        if not result:
-            result = helper(search)
-        return result
-    except Exception as e:
+        session = self.get_session()
+        def helper(search_keyword: str) -> Union[NameDesc, None, NoReturn]:
+            url = "https://ygocdb.com/api/v0/?search="
+            r = session.get(url + search_keyword)
+            if r.status_code != 200:
+                raise ConnectionError()
+            result = r.json()["result"]
+            if len(result) == 0:
+                return None  # 找不到 直接返回 None
+
+            item = None
+            for card_item in result:
+                if card_item["cid"] == cid or card_item["md_name"] == search:
+                    item = card_item
+                    break
+
+            if not item:
+                return None
+
+            name: str = item["cn_name"]
+            desc: str = item["text"]["desc"]
+            if (p_desc := item["text"]["pdesc"]) != "":
+                desc = f"{desc}\n【灵摆效果】\n{p_desc}"
+
+            name = UnifyChar.unity_name(name)  # 修正名字显示不正确的各种问题
+            desc = UnifyChar.unity_desc(desc)  # 修正灵摆...修正\r\n
+            if dev_mode:
+                CacheManager.add_cache(cid,
+                                       jp_name=item.get('jp_name', ''),
+                                       cn_name=item.get('cn_name', ''),
+                                       md_name=item.get('md_name', ''),
+                                       original_desc=desc_src,
+                                       custom_desc=desc)
+            return {"name": name, "desc": desc}
+
         try:
-            return helper(search)
-        except:
-            network_error_cb()
-            return None
+            result = helper(str(cid))
+            if not result:
+                result = helper(search)
+            return result
+        except Exception as e:
+            try:
+                return helper(search)
+            except:
+                network_error_cb()
+                return None
 
 
 if __name__ == "__main__":
