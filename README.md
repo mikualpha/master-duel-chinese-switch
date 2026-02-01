@@ -29,7 +29,7 @@
 本项目使用 `UnityPy` 解包，使用 `flet` 制作界面。编译环境为`Python 3.10`。
 
 <div align="center">
-  <img src="./images/display.png">
+  <img src="./images/display.png" width="400">
 </div>
 
 #### 准备
