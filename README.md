@@ -28,7 +28,10 @@
 ## 开发相关
 本项目使用 `UnityPy` 解包，使用 `flet` 制作界面。编译环境为`Python 3.10`。
 
-![](./images/display.jpg)
+<div align="center">
+  <img src="./images/display.png">
+</div>
+
 #### 准备
 
 ```
