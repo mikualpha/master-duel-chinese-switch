@@ -1,3 +1,35 @@
+
+<div align="right">
+  <details>
+    <summary >🌐 Language</summary>
+    <div>
+      <div align="center">
+        <a href="https://openaitx.github.io/view.html?user=mikualpha&project=master-duel-chinese-switch&lang=en">English</a>
+        | <a href="https://openaitx.github.io/view.html?user=mikualpha&project=master-duel-chinese-switch&lang=zh-CN">简体中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=mikualpha&project=master-duel-chinese-switch&lang=zh-TW">繁體中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=mikualpha&project=master-duel-chinese-switch&lang=ja">日本語</a>
+        | <a href="https://openaitx.github.io/view.html?user=mikualpha&project=master-duel-chinese-switch&lang=ko">한국어</a>
+        | <a href="https://openaitx.github.io/view.html?user=mikualpha&project=master-duel-chinese-switch&lang=hi">हिन्दी</a>
+        | <a href="https://openaitx.github.io/view.html?user=mikualpha&project=master-duel-chinese-switch&lang=th">ไทย</a>
+        | <a href="https://openaitx.github.io/view.html?user=mikualpha&project=master-duel-chinese-switch&lang=fr">Français</a>
+        | <a href="https://openaitx.github.io/view.html?user=mikualpha&project=master-duel-chinese-switch&lang=de">Deutsch</a>
+        | <a href="https://openaitx.github.io/view.html?user=mikualpha&project=master-duel-chinese-switch&lang=es">Español</a>
+        | <a href="https://openaitx.github.io/view.html?user=mikualpha&project=master-duel-chinese-switch&lang=it">Italiano</a>
+        | <a href="https://openaitx.github.io/view.html?user=mikualpha&project=master-duel-chinese-switch&lang=ru">Русский</a>
+        | <a href="https://openaitx.github.io/view.html?user=mikualpha&project=master-duel-chinese-switch&lang=pt">Português</a>
+        | <a href="https://openaitx.github.io/view.html?user=mikualpha&project=master-duel-chinese-switch&lang=nl">Nederlands</a>
+        | <a href="https://openaitx.github.io/view.html?user=mikualpha&project=master-duel-chinese-switch&lang=pl">Polski</a>
+        | <a href="https://openaitx.github.io/view.html?user=mikualpha&project=master-duel-chinese-switch&lang=ar">العربية</a>
+        | <a href="https://openaitx.github.io/view.html?user=mikualpha&project=master-duel-chinese-switch&lang=fa">فارسی</a>
+        | <a href="https://openaitx.github.io/view.html?user=mikualpha&project=master-duel-chinese-switch&lang=tr">Türkçe</a>
+        | <a href="https://openaitx.github.io/view.html?user=mikualpha&project=master-duel-chinese-switch&lang=vi">Tiếng Việt</a>
+        | <a href="https://openaitx.github.io/view.html?user=mikualpha&project=master-duel-chinese-switch&lang=id">Bahasa Indonesia</a>
+        | <a href="https://openaitx.github.io/view.html?user=mikualpha&project=master-duel-chinese-switch&lang=as">অসমীয়া</
+      </div>
+    </div>
+  </details>
+</div>
+
 <h1 align="center">Master Duel 社区中文翻译补丁</h1>
 <div align="center">
 
