@@ -160,7 +160,7 @@ class TranslateHelper:
 
         # 未找到对应的日文名
         if self.dev_mode:
-            tqdm.tqdm.write(f"WARN: Can't find {name_md}({cid})")
+            tqdm.tqdm.write(f"WARN: Can't find {name_md}({cid}){": " + desc_md if "衍生物" not in name_md else ""}")
 
         item["name"]["custom"] = item["name"]["zh-cn"]
         item["desc"]["custom"] = item["desc"]["zh-cn"]
